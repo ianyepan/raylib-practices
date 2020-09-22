@@ -25,7 +25,8 @@ void drawPulsingSquare(float posX, float posY, raylib::Color color)
 
   length += sizeChange;
 
-  DrawRectangleRec(raylib::Rectangle{posX - length / 2, posY - length / 2, length, length}, color);
+  raylib::Rectangle rec{posX - length / 2, posY - length / 2, length, length};
+  rec.Draw(color);
 }
 
 void drawRotateRectangle(float posX, float posY, raylib::Color color)
@@ -44,8 +45,8 @@ void drawRotateRectangle(float posX, float posY, raylib::Color color)
   }
 
   rotationAngle += 1.5f;
-  DrawRectanglePro(raylib::Rectangle{posX, posY, recWidth, recHeight}, raylib::Vector2{recHeight / 10, recWidth / 3},
-                   rotationAngle, color);
+  raylib::Rectangle rec{posX, posY, recWidth, recHeight};
+  rec.Draw(raylib::Vector2{recHeight / 10, recWidth / 3}, rotationAngle, color);
 }
 
 int main()
