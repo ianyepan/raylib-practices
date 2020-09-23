@@ -16,8 +16,11 @@ const int SCREEN_WIDTH = 1200;
 const int SCREEN_HEIGHT = 675;
 const int PLAYER_SPEED = 15 / 2;
 const int BALL_SPEED = 8 / 2;
-const std::vector<raylib::Color> COLOR_VECTOR{raylib::Color::Green, raylib::Color::Blue, raylib::Color::Red,
-                                              raylib::Color::Pink, raylib::Color::Gold};
+const std::vector<raylib::Color> COLOR_VECTOR{raylib::Color::Green,
+                                              raylib::Color::Blue,
+                                              raylib::Color::Red,
+                                              raylib::Color::Pink,
+                                              raylib::Color::Gold};
 const int NUM_OF_COLORS = (int)COLOR_VECTOR.size();
 
 struct Player
@@ -65,19 +68,18 @@ struct Brick
 // Global Variables Declaration
 static bool gameOver = false;
 static bool pause = false;
-
 static Player player;
 static Ball ball;
 static Brick brick[BRICK_ROWS][BRICK_COLUMNS];
 static raylib::Vector2 brickSize;
 
-// Module Functions Declaration (local)
-static void InitGame(void);        // Initialize game
-static void UpdateGame(void);      // Update game (one frame)
-static void DrawGame(void);        // Draw game (one frame)
-static void UpdateDrawFrame(void); // Update and Draw (one frame)
+// Function prototypes
+static void InitGame();        // Initialize game
+static void UpdateGame();      // Update game (one frame)
+static void DrawGame();        // Draw game (one frame)
+static void UpdateDrawFrame(); // Update and Draw (one frame)
 
-int main(void)
+int main()
 {
   raylib::Window window{SCREEN_WIDTH, SCREEN_HEIGHT, "Sample game: Arkanoid"};
 
@@ -93,12 +95,12 @@ int main(void)
   return 0;
 }
 
-void InitGame(void)
+void InitGame()
 {
-  brickSize = raylib::Vector2{(float)GetScreenWidth() / BRICK_COLUMNS, 40};
+  brickSize = raylib::Vector2{(float)::GetScreenWidth() / BRICK_COLUMNS, 40};
 
-  player.Init(raylib::Vector2{SCREEN_WIDTH / 2, SCREEN_HEIGHT * 7 / 8}, raylib::Vector2{SCREEN_WIDTH / 7, 20},
-              PLAYER_MAX_LIFE);
+  player.Init(
+      raylib::Vector2{SCREEN_WIDTH / 2, SCREEN_HEIGHT * 7 / 8}, raylib::Vector2{SCREEN_WIDTH / 7, 20}, PLAYER_MAX_LIFE);
 
   ball.Init(raylib::Vector2{SCREEN_WIDTH / 2, SCREEN_HEIGHT * 7 / 8 - 30}, (raylib::Vector2){0, 0}, 10, false);
 
@@ -115,7 +117,7 @@ void InitGame(void)
 }
 
 // Update game (one frame)
-void UpdateGame(void)
+void UpdateGame()
 {
   if (!gameOver)
   {
@@ -182,13 +184,17 @@ void UpdateGame(void)
       }
 
       // Collision logic: ball vs player
-      if (CheckCollisionCircleRec(ball.position, ball.radius,
-                                  (Rectangle){player.position.x - player.size.x / 2,
-                                              player.position.y - player.size.y / 2, player.size.x, player.size.y}))
+      raylib::Rectangle playerRectangle{player.position.GetX() - player.size.GetX() / 2,
+                                        player.position.GetY() - player.size.GetY() / 2,
+                                        player.size.GetX(),
+                                        player.size.GetY()};
+      if (::CheckCollisionCircleRec(ball.position, ball.radius, playerRectangle))
       {
         if (ball.speed.y > 0)
         {
           ball.speed.y *= -1;
+
+          // reflect with an angle
           ball.speed.x = (ball.position.x - player.position.x) / (player.size.x / 2) * 5;
         }
       }
@@ -269,7 +275,7 @@ void UpdateGame(void)
 }
 
 // Draw game (one frame)
-void DrawGame(void)
+void DrawGame()
 {
   ::BeginDrawing();
 
@@ -278,8 +284,12 @@ void DrawGame(void)
   if (!gameOver)
   {
     // Draw player bar
-    ::DrawRectangleGradientV(player.position.x - player.size.x / 2, player.position.y - player.size.y / 2,
-                             player.size.x, player.size.y, raylib::Color::LightGray, raylib::Color::DarkGray);
+    ::DrawRectangleGradientV(player.position.x - player.size.x / 2,
+                             player.position.y - player.size.y / 2,
+                             player.size.x,
+                             player.size.y,
+                             raylib::Color::LightGray,
+                             raylib::Color::DarkGray);
 
     // Draw lives (health)
     for (int i = 0; i < player.life; ++i)
@@ -289,8 +299,8 @@ void DrawGame(void)
 
     // Draw ball
     // ball.position.DrawCircle(ball.radius, raylib::Color::Maroon);
-    ::DrawCircleGradient(ball.position.GetX(), ball.position.GetY(), ball.radius, raylib::Color::White,
-                         raylib::Color::Red);
+    ::DrawCircleGradient(
+        ball.position.GetX(), ball.position.GetY(), ball.radius, raylib::Color::White, raylib::Color::Red);
 
     // Draw bricks
     for (int i = 0; i < BRICK_ROWS; ++i)
@@ -300,29 +310,38 @@ void DrawGame(void)
         if (brick[i][j].active)
         {
           ::DrawRectangleGradientV(brick[i][j].position.GetX() - brickSize.GetX() / 2,
-                                   brick[i][j].position.GetY() - brickSize.GetY() / 2, brickSize.GetX(),
-                                   brickSize.GetY(), COLOR_VECTOR[(i + j) % (int)COLOR_VECTOR.size()],
+                                   brick[i][j].position.GetY() - brickSize.GetY() / 2,
+                                   brickSize.GetX(),
+                                   brickSize.GetY(),
+                                   COLOR_VECTOR[(i + j) % (int)COLOR_VECTOR.size()],
                                    ::Fade(COLOR_VECTOR[(i + j) % (int)COLOR_VECTOR.size()], 0.5f));
           ::DrawRectangleLines(brick[i][j].position.GetX() - brickSize.GetX() / 2,
-                               brick[i][j].position.GetY() - brickSize.GetY() / 2, brickSize.GetX(), brickSize.GetY(),
+                               brick[i][j].position.GetY() - brickSize.GetY() / 2,
+                               brickSize.GetX(),
+                               brickSize.GetY(),
                                raylib::Color::LightGray);
         }
       }
     }
 
     if (pause)
-      ::DrawText("GAME PAUSED", SCREEN_WIDTH / 2 - MeasureText("GAME PAUSED", 40) / 2, SCREEN_HEIGHT / 2 - 40, 40,
-                 GRAY);
+      ::DrawText(
+          "GAME PAUSED", SCREEN_WIDTH / 2 - MeasureText("GAME PAUSED", 40) / 2, SCREEN_HEIGHT / 2 - 40, 40, GRAY);
   }
-  else
-    ::DrawText("PRESS [ENTER] TO PLAY AGAIN", GetScreenWidth() / 2 - MeasureText("PRESS [ENTER] TO PLAY AGAIN", 20) / 2,
-               GetScreenHeight() / 2 - 50, 20, GRAY);
+  else // Game over
+  {
+    ::DrawText("PRESS [ENTER] TO PLAY AGAIN",
+               ::GetScreenWidth() / 2 - ::MeasureText("PRESS [ENTER] TO PLAY AGAIN", 20) / 2,
+               ::GetScreenHeight() / 2 - 50,
+               20,
+               raylib::Color::Gray);
+  }
 
   ::EndDrawing();
 }
 
 // Update and Draw (one frame)
-void UpdateDrawFrame(void)
+void UpdateDrawFrame()
 {
   UpdateGame();
   DrawGame();

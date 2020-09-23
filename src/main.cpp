@@ -42,8 +42,11 @@ int main()
   raylib::Window window(WIDTH, HEIGHT, "Raylib-CPP First Person");
   raylib::Color background(RAYWHITE);
 
-  raylib::Camera3D camera(raylib::Vector3(4.0f, 2.0f, 4.0f), raylib::Vector3(0.0f, 1.8f, 0.0f),
-                          raylib::Vector3(0.0f, 1.0f, 0.0f), 60.0f, CAMERA_PERSPECTIVE);
+  raylib::Camera3D camera(raylib::Vector3(4.0f, 2.0f, 4.0f),
+                          raylib::Vector3(0.0f, 1.8f, 0.0f),
+                          raylib::Vector3(0.0f, 1.0f, 0.0f),
+                          60.0f,
+                          CAMERA_PERSPECTIVE);
 
   // Generates some random columns
   std::vector<float> heights(MAX_COLUMNS); // float heights[MAX_COLUMNS] = {0.0f};
