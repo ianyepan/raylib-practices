@@ -115,13 +115,14 @@ void InitGame()
   ball.Init(raylib::Vector2{SCREEN_WIDTH / 2, SCREEN_HEIGHT * 7 / 8 - 30}, (raylib::Vector2){0, 0}, BALL_SIZE, false);
 
   // Initialize bricks
-  int offset = 50;
+  int marginTop = brickSize.GetY() * 2;
 
   for (int i = 0; i < BRICK_ROWS; ++i)
   {
     for (int j = 0; j < BRICK_COLUMNS; ++j)
     {
-      brick[i][j].Init(raylib::Vector2{j * brickSize.GetX() + brickSize.GetX() / 2, i * brickSize.y + offset}, true);
+      brick[i][j].Init(raylib::Vector2{j * brickSize.GetX() + brickSize.GetX() / 2, i * brickSize.GetY() + marginTop},
+                       true);
     }
   }
 }
@@ -300,16 +301,23 @@ void DrawGame()
 
   if (!gameOver)
   {
+    // Draw lives (health)
+    raylib::Vector2 hudPosition{20, SCREEN_HEIGHT - 70};
+    raylib::Vector2 hudSize{150, 40};
+    hudPosition.DrawRectangle(hudSize, raylib::Color::Green.Fade(0.5f));
+    ::DrawRectangleLines(hudPosition.GetX(), hudPosition.GetY(), hudSize.GetX(), hudSize.GetY(),
+                         raylib::Color::RayWhite);
+    ::DrawText("Lives Left:", hudPosition.GetX() + 10, hudPosition.GetY() + 10, 20, raylib::Color::Green);
+
+    for (int i = 0; i < player.life; ++i)
+    {
+      DrawRectangleGradientV(20 + 40 * i, SCREEN_HEIGHT - 20, 35, 10, raylib::Color::Green, raylib::Color::Lime);
+    }
+
     // Draw player bar
     ::DrawRectangleGradientV(player.position.GetX() - player.size.GetX() / 2,
                              player.position.GetY() - player.size.GetY() / 2, player.size.GetX(), player.size.GetY(),
                              raylib::Color::LightGray, raylib::Color::DarkGray);
-
-    // Draw lives (health)
-    for (int i = 0; i < player.life; ++i)
-    {
-      DrawRectangleGradientV(20 + 40 * i, SCREEN_HEIGHT - 30, 35, 10, raylib::Color::Green, raylib::Color::Lime);
-    }
 
     // Draw ball
     ::DrawCircleGradient(ball.position.GetX(), ball.position.GetY(), ball.radius, raylib::Color::White, ballColorState);
