@@ -9,6 +9,8 @@
 #include <cmath>
 #include <vector>
 
+// Compile command: g++ arkanoid.cpp -lraylib -lGL -lm -lpthread -ldl -lrt -lX11 -std=c++17
+
 const int PLAYER_MAX_LIFE = 5;
 const int BRICK_ROWS = 5;
 const int BRICK_COLUMNS = 20;
@@ -17,10 +19,12 @@ const int SCREEN_HEIGHT = 675;
 const int PLAYER_SPEED = 15 / 2;
 const int BALL_SPEED = 8 / 2;
 const raylib::Color BG_COLOR{3, 1, 146};
-const raylib::Color PLAYER_COLOR{raylib::Color::LightGray};
-const raylib::Color BALL_COLOR{raylib::Color::Red};
+const raylib::Color BALL_COLOR{raylib::Color::White};
 const std::vector<raylib::Color> COLOR_VECTOR{raylib::Color::Green, raylib::Color::Blue, raylib::Color::Red,
                                               raylib::Color::Pink, raylib::Color::Gold};
+const std::vector<raylib::Color> TINT_VECTOR{raylib::Color{150, 255, 150}, raylib::Color{150, 150, 255},
+                                             raylib::Color{255, 150, 150}, raylib::Color{255, 100, 255},
+                                             raylib::Color{255, 255, 100}};
 const int NUM_OF_COLORS = (int)COLOR_VECTOR.size();
 
 auto checkedImage = raylib::Image::GenChecked(SCREEN_WIDTH, SCREEN_HEIGHT, 10, 10, BG_COLOR, BG_COLOR.Fade(0.9f));
@@ -126,7 +130,7 @@ void UpdateGame()
 {
   if (!gameOver)
   {
-    if (IsKeyPressed('P'))
+    if (::IsKeyPressed('P'))
     {
       pause = !pause;
     }
@@ -134,27 +138,27 @@ void UpdateGame()
     if (!pause)
     {
       // Player movement logic
-      if (IsKeyDown(KEY_LEFT))
+      if (::IsKeyDown(::KEY_LEFT))
       {
-        player.position.x -= PLAYER_SPEED;
+        player.position.SetX(player.position.GetX() - PLAYER_SPEED);
       }
       if ((player.position.x - player.size.x / 2) <= 0)
       {
-        player.position.x = player.size.x / 2;
+        player.position.SetX(player.size.GetX() / 2);
       }
-      if (IsKeyDown(KEY_RIGHT))
+      if (::IsKeyDown(::KEY_RIGHT))
       {
-        player.position.x += PLAYER_SPEED;
+        player.position.SetX(player.position.GetX() + PLAYER_SPEED);
       }
       if ((player.position.x + player.size.x / 2) >= SCREEN_WIDTH)
       {
-        player.position.x = SCREEN_WIDTH - player.size.x / 2;
+        player.position.SetX(SCREEN_WIDTH - player.size.GetX() / 2);
       }
 
       // Ball launching logic
       if (!ball.shouldRender)
       {
-        if (IsKeyPressed(KEY_SPACE))
+        if (::IsKeyPressed(::KEY_SPACE))
         {
           ball.shouldRender = true;
           ball.speed = raylib::Vector2{0, -BALL_SPEED}; // straight up
@@ -175,10 +179,12 @@ void UpdateGame()
 
       // Collision logic: ball vs window walls
       if (((ball.position.GetX() + ball.radius) >= SCREEN_WIDTH) || ((ball.position.GetX() - ball.radius) <= 0))
-        ball.speed.x *= -1;
+      {
+        ball.speed.SetX(ball.speed.GetX() * -1);
+      }
       if ((ball.position.GetY() - ball.radius) <= 0)
       {
-        ball.speed.y *= -1;
+        ball.speed.SetY(ball.speed.GetY() * -1);
       }
       if ((ball.position.GetY() + ball.radius) >= SCREEN_HEIGHT) // drop below window
       {
@@ -270,7 +276,7 @@ void UpdateGame()
   }
   else
   {
-    if (IsKeyPressed(KEY_ENTER))
+    if (::IsKeyPressed(::KEY_ENTER))
     {
       InitGame();
       gameOver = false;
@@ -292,7 +298,7 @@ void DrawGame()
     // Draw player bar
     ::DrawRectangleGradientV(player.position.GetX() - player.size.GetX() / 2,
                              player.position.GetY() - player.size.GetY() / 2, player.size.GetX(), player.size.GetY(),
-                             PLAYER_COLOR, PLAYER_COLOR.Fade(0.5f));
+                             raylib::Color::LightGray, raylib::Color::DarkGray);
 
     // Draw lives (health)
     for (int i = 0; i < player.life; ++i)
@@ -310,13 +316,14 @@ void DrawGame()
       {
         if (brick[i][j].shouldRender)
         {
-          ::DrawRectangleGradientV(brick[i][j].position.GetX() - brickSize.GetX() / 2,
+          ::DrawRectangleGradientH(brick[i][j].position.GetX() - brickSize.GetX() / 2,
                                    brick[i][j].position.GetY() - brickSize.GetY() / 2, brickSize.GetX(),
                                    brickSize.GetY(), COLOR_VECTOR[(i + j) % (int)COLOR_VECTOR.size()],
-                                   ::Fade(COLOR_VECTOR[(i + j) % (int)COLOR_VECTOR.size()], 0.5f));
-          ::DrawRectangleLines(brick[i][j].position.GetX() - brickSize.GetX() / 2,
-                               brick[i][j].position.GetY() - brickSize.GetY() / 2, brickSize.GetX(), brickSize.GetY(),
-                               raylib::Color::LightGray);
+                                   TINT_VECTOR[(i + j) % (int)TINT_VECTOR.size()]);
+          ::DrawRectangleLinesEx(raylib::Rectangle{brick[i][j].position.GetX() - brickSize.GetX() / 2,
+                                                   brick[i][j].position.GetY() - brickSize.GetY() / 2, brickSize.GetX(),
+                                                   brickSize.GetY()},
+                                 3, raylib::Color::Black);
         }
       }
     }
