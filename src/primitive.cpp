@@ -9,7 +9,7 @@
 const int WIDTH = 900;
 const int HEIGHT = 600;
 
-void drawPulsingSquare(float posX, float posY, raylib::Color color)
+void DrawPulsingSquare(float posX, float posY, raylib::Color color)
 {
   static float length = 80;
   static float sizeChange = 3.0f;
@@ -26,10 +26,13 @@ void drawPulsingSquare(float posX, float posY, raylib::Color color)
   length += sizeChange;
 
   raylib::Rectangle rec{posX - length / 2, posY - length / 2, length, length};
-  rec.Draw(color);
+  rec.DrawGradientH(raylib::Color{200, 200, 200}, raylib::Color{0, 100, 200});
+
+  raylib::Rectangle recGradient{posX * 2 - length / 2, posY * 2 - length / 2, length, length};
+  recGradient.DrawGradientV(raylib::Color{200, 200, 200}, raylib::Color{0, 100, 200});
 }
 
-void drawRotateRectangle(float posX, float posY, raylib::Color color)
+void DrawRotateRectangle(float posX, float posY, raylib::Color color)
 {
   static float recWidth = 60.0f;
   static float recHeight = 50.0f;
@@ -45,6 +48,7 @@ void drawRotateRectangle(float posX, float posY, raylib::Color color)
   }
 
   rotationAngle += 1.5f;
+
   raylib::Rectangle rec{posX, posY, recWidth, recHeight};
   rec.Draw(raylib::Vector2{recHeight / 10, recWidth / 3}, rotationAngle, color);
 }
@@ -57,7 +61,7 @@ int main()
 
   while (!window.ShouldClose()) // Detect window close button or ESC key
   {
-    BeginDrawing();
+    ::BeginDrawing();
 
     raylib::Color::RayWhite.ClearBackground();
 
@@ -71,13 +75,13 @@ int main()
     }
 
     xPosition += step;
-    DrawText("Rip And Tear", xPosition, 20, 30, raylib::Color::Maroon);
+    ::DrawText("Rip And Tear", xPosition, 20, 30, raylib::Color::Maroon);
 
-    drawPulsingSquare(100, 200, raylib::Color::Blue);
+    DrawPulsingSquare(100, 200, raylib::Color::Blue);
 
-    drawRotateRectangle(500, 200, raylib::Color::Maroon);
+    DrawRotateRectangle(500, 200, raylib::Color::Maroon);
 
-    EndDrawing();
+    ::EndDrawing();
   }
 
   return 0;
