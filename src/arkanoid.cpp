@@ -16,11 +16,15 @@ const int SCREEN_WIDTH = 1200;
 const int SCREEN_HEIGHT = 675;
 const int PLAYER_SPEED = 15 / 2;
 const int BALL_SPEED = 8 / 2;
-const raylib::Color BG_COLOR{11, 11, 11};
+const raylib::Color BG_COLOR{3, 1, 146};
 const raylib::Color PLAYER_COLOR{raylib::Color::LightGray};
+const raylib::Color BALL_COLOR{raylib::Color::Red};
 const std::vector<raylib::Color> COLOR_VECTOR{raylib::Color::Green, raylib::Color::Blue, raylib::Color::Red,
                                               raylib::Color::Pink, raylib::Color::Gold};
 const int NUM_OF_COLORS = (int)COLOR_VECTOR.size();
+
+auto checkedImage = raylib::Image::GenChecked(SCREEN_WIDTH, SCREEN_HEIGHT, 10, 10, BG_COLOR, BG_COLOR.Fade(0.9f));
+raylib::Texture2D backgroundTexture;
 
 struct Player
 {
@@ -86,6 +90,8 @@ int main()
 
   SetTargetFPS(120);
 
+  backgroundTexture.LoadFromImage(checkedImage);
+
   while (!window.ShouldClose())
   {
     UpdateDrawFrame();
@@ -115,7 +121,7 @@ void InitGame()
   }
 }
 
-// Update game (one frame)
+// Update game variables (one frame)
 void UpdateGame()
 {
   if (!gameOver)
@@ -277,7 +283,9 @@ void DrawGame()
 {
   ::BeginDrawing();
 
-  ClearBackground(BG_COLOR);
+  ::ClearBackground(raylib::Color::RayWhite);
+
+  ::DrawTexture(backgroundTexture, 0, 0, raylib::Color::White);
 
   if (!gameOver)
   {
@@ -293,8 +301,7 @@ void DrawGame()
     }
 
     // Draw ball
-    ::DrawCircleGradient(ball.position.GetX(), ball.position.GetY(), ball.radius, raylib::Color::White,
-                         raylib::Color::Red);
+    ::DrawCircleGradient(ball.position.GetX(), ball.position.GetY(), ball.radius, BALL_COLOR.Fade(0.9f), BALL_COLOR);
 
     // Draw bricks
     for (int i = 0; i < BRICK_ROWS; ++i)
