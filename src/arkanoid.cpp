@@ -13,13 +13,13 @@
 
 const int PLAYER_MAX_LIFE = 5;
 const int BRICK_ROWS = 5;
-const int BRICK_COLUMNS = 20;
-const int SCREEN_WIDTH = 1200;
+const int BRICK_COLUMNS = 15;
+const int SCREEN_WIDTH = 1000;
 const int SCREEN_HEIGHT = 675;
-const int PLAYER_SPEED = 15 / 2;
-const int BALL_SPEED = 8 / 2;
+const int PLAYER_SPEED = 8;
+const int BALL_SIZE = 12;
+const int BALL_SPEED = 4;
 const raylib::Color BG_COLOR{3, 1, 146};
-const raylib::Color BALL_COLOR{raylib::Color::White};
 const std::vector<raylib::Color> COLOR_VECTOR{raylib::Color::Green, raylib::Color::Blue, raylib::Color::Red,
                                               raylib::Color::Pink, raylib::Color::Gold};
 const std::vector<raylib::Color> TINT_VECTOR{raylib::Color{150, 255, 150}, raylib::Color{150, 150, 255},
@@ -79,6 +79,7 @@ static Player player;
 static Ball ball;
 static Brick brick[BRICK_ROWS][BRICK_COLUMNS];
 static raylib::Vector2 brickSize;
+static raylib::Color ballColorState = raylib::Color::LightGray;
 
 // Function prototypes
 static void InitGame();        // Initialize game
@@ -111,7 +112,7 @@ void InitGame()
   player.Init(raylib::Vector2{SCREEN_WIDTH / 2, SCREEN_HEIGHT * 7 / 8}, raylib::Vector2{SCREEN_WIDTH / 7, 20},
               PLAYER_MAX_LIFE);
 
-  ball.Init(raylib::Vector2{SCREEN_WIDTH / 2, SCREEN_HEIGHT * 7 / 8 - 30}, (raylib::Vector2){0, 0}, 10, false);
+  ball.Init(raylib::Vector2{SCREEN_WIDTH / 2, SCREEN_HEIGHT * 7 / 8 - 30}, (raylib::Vector2){0, 0}, BALL_SIZE, false);
 
   // Initialize bricks
   int offset = 50;
@@ -224,6 +225,7 @@ void UpdateGame()
             {
               brick[i][j].shouldRender = false;
               ball.speed.SetY(ball.speed.GetY() * -1);
+              ballColorState = COLOR_VECTOR[(i + j) % (int)COLOR_VECTOR.size()];
             }
             // Hit above
             else if (((ball.position.y + ball.radius) >= (brick[i][j].position.y - brickSize.y / 2)) &&
@@ -233,6 +235,7 @@ void UpdateGame()
             {
               brick[i][j].shouldRender = false;
               ball.speed.SetY(ball.speed.GetY() * -1);
+              ballColorState = COLOR_VECTOR[(i + j) % (int)COLOR_VECTOR.size()];
             }
             // Hit left
             else if (((ball.position.x + ball.radius) >= (brick[i][j].position.x - brickSize.x / 2)) &&
@@ -242,6 +245,7 @@ void UpdateGame()
             {
               brick[i][j].shouldRender = false;
               ball.speed.SetX(ball.speed.GetX() * -1);
+              ballColorState = COLOR_VECTOR[(i + j) % (int)COLOR_VECTOR.size()];
             }
             // Hit right
             else if (((ball.position.x - ball.radius) <= (brick[i][j].position.x + brickSize.x / 2)) &&
@@ -251,6 +255,7 @@ void UpdateGame()
             {
               brick[i][j].shouldRender = false;
               ball.speed.SetX(ball.speed.GetX() * -1);
+              ballColorState = COLOR_VECTOR[(i + j) % (int)COLOR_VECTOR.size()];
             }
           }
         }
@@ -307,7 +312,7 @@ void DrawGame()
     }
 
     // Draw ball
-    ::DrawCircleGradient(ball.position.GetX(), ball.position.GetY(), ball.radius, BALL_COLOR.Fade(0.9f), BALL_COLOR);
+    ::DrawCircleGradient(ball.position.GetX(), ball.position.GetY(), ball.radius, raylib::Color::White, ballColorState);
 
     // Draw bricks
     for (int i = 0; i < BRICK_ROWS; ++i)
