@@ -1,6 +1,3 @@
 BasedOnStyle: Microsoft
 IndentWidth: 2
 AccessModifierOffset: -2
-AllowAllParametersOfDeclarationOnNextLine: false
-BinPackArguments: false
-BinPackParameters: false
