@@ -16,6 +16,8 @@ const int SCREEN_WIDTH = 1200;
 const int SCREEN_HEIGHT = 675;
 const int PLAYER_SPEED = 15 / 2;
 const int BALL_SPEED = 8 / 2;
+const raylib::Color BG_COLOR{11,11,11};
+const raylib::Color PLAYER_COLOR{raylib::Color::LightGray};
 const std::vector<raylib::Color> COLOR_VECTOR{raylib::Color::Green,
                                               raylib::Color::Blue,
                                               raylib::Color::Red,
@@ -42,26 +44,26 @@ struct Ball
   raylib::Vector2 position;
   raylib::Vector2 speed;
   int radius;
-  bool active;
+  bool shouldRender;
 
-  void Init(raylib::Vector2 position, raylib::Vector2 speed, int radius, bool active)
+  void Init(raylib::Vector2 position, raylib::Vector2 speed, int radius, bool shouldRender)
   {
     this->position = position;
     this->speed = speed;
     this->radius = radius;
-    this->active = active;
+    this->shouldRender = shouldRender;
   }
 };
 
 struct Brick
 {
   raylib::Vector2 position;
-  bool active;
+  bool shouldRender;
 
-  void Init(raylib::Vector2 position, bool active)
+  void Init(raylib::Vector2 position, bool shouldRender)
   {
     this->position = position;
-    this->active = active;
+    this->shouldRender = shouldRender;
   }
 };
 
@@ -147,17 +149,17 @@ void UpdateGame()
       }
 
       // Ball launching logic
-      if (!ball.active)
+      if (!ball.shouldRender)
       {
         if (IsKeyPressed(KEY_SPACE))
         {
-          ball.active = true;
+          ball.shouldRender = true;
           ball.speed = raylib::Vector2{0, -BALL_SPEED}; // straight up
         }
       }
 
       // Ball movement logic
-      if (ball.active)
+      if (ball.shouldRender)
       {
         ball.position.SetX(ball.position.GetX() + ball.speed.GetX());
         ball.position.SetY(ball.position.GetY() + ball.speed.GetY());
@@ -178,7 +180,7 @@ void UpdateGame()
       if ((ball.position.GetY() + ball.radius) >= SCREEN_HEIGHT) // drop below window
       {
         ball.speed = (raylib::Vector2){0, 0};
-        ball.active = false;
+        ball.shouldRender = false;
 
         --player.life;
       }
@@ -190,12 +192,12 @@ void UpdateGame()
                                         player.size.GetY()};
       if (::CheckCollisionCircleRec(ball.position, ball.radius, playerRectangle))
       {
-        if (ball.speed.y > 0)
+        if (ball.speed.GetY() > 0)
         {
-          ball.speed.y *= -1;
+          ball.speed.SetY(ball.speed.GetY() * -1);
 
           // reflect with an angle
-          ball.speed.x = (ball.position.x - player.position.x) / (player.size.x / 2) * 5;
+          ball.speed.SetX((ball.position.GetX() - player.position.GetX()) / (player.size.GetX() / 2) * 5);
         }
       }
 
@@ -204,7 +206,7 @@ void UpdateGame()
       {
         for (int j = 0; j < BRICK_COLUMNS; ++j)
         {
-          if (brick[i][j].active)
+          if (brick[i][j].shouldRender)
           {
             // Hit below
             if (((ball.position.y - ball.radius) <= (brick[i][j].position.y + brickSize.y / 2)) &&
@@ -212,8 +214,8 @@ void UpdateGame()
                 ((fabs(ball.position.x - brick[i][j].position.x)) < (brickSize.x / 2 + ball.radius * 2 / 3)) &&
                 (ball.speed.y < 0))
             {
-              brick[i][j].active = false;
-              ball.speed.y *= -1;
+              brick[i][j].shouldRender = false;
+              ball.speed.SetY(ball.speed.GetY() * -1);
             }
             // Hit above
             else if (((ball.position.y + ball.radius) >= (brick[i][j].position.y - brickSize.y / 2)) &&
@@ -221,8 +223,8 @@ void UpdateGame()
                      ((fabs(ball.position.x - brick[i][j].position.x)) < (brickSize.x / 2 + ball.radius * 2 / 3)) &&
                      (ball.speed.y > 0))
             {
-              brick[i][j].active = false;
-              ball.speed.y *= -1;
+              brick[i][j].shouldRender = false;
+              ball.speed.SetY(ball.speed.GetY() * -1);
             }
             // Hit left
             else if (((ball.position.x + ball.radius) >= (brick[i][j].position.x - brickSize.x / 2)) &&
@@ -230,8 +232,8 @@ void UpdateGame()
                      ((fabs(ball.position.y - brick[i][j].position.y)) < (brickSize.y / 2 + ball.radius * 2 / 3)) &&
                      (ball.speed.x > 0))
             {
-              brick[i][j].active = false;
-              ball.speed.x *= -1;
+              brick[i][j].shouldRender = false;
+              ball.speed.SetX(ball.speed.GetX() * -1);
             }
             // Hit right
             else if (((ball.position.x - ball.radius) <= (brick[i][j].position.x + brickSize.x / 2)) &&
@@ -239,8 +241,8 @@ void UpdateGame()
                      ((fabs(ball.position.y - brick[i][j].position.y)) < (brickSize.y / 2 + ball.radius * 2 / 3)) &&
                      (ball.speed.x < 0))
             {
-              brick[i][j].active = false;
-              ball.speed.x *= -1;
+              brick[i][j].shouldRender = false;
+              ball.speed.SetX(ball.speed.GetX() * -1);
             }
           }
         }
@@ -257,7 +259,7 @@ void UpdateGame()
         {
           for (int j = 0; j < BRICK_COLUMNS; ++j)
           {
-            if (brick[i][j].active)
+            if (brick[i][j].shouldRender)
               gameOver = false;
           }
         }
@@ -279,17 +281,17 @@ void DrawGame()
 {
   ::BeginDrawing();
 
-  ClearBackground(raylib::Color{41, 41, 41});
+  ClearBackground(BG_COLOR);
 
   if (!gameOver)
   {
     // Draw player bar
-    ::DrawRectangleGradientV(player.position.x - player.size.x / 2,
-                             player.position.y - player.size.y / 2,
-                             player.size.x,
-                             player.size.y,
-                             raylib::Color::LightGray,
-                             raylib::Color::DarkGray);
+    ::DrawRectangleGradientV(player.position.GetX() - player.size.GetX() / 2,
+                             player.position.GetY() - player.size.GetY() / 2,
+                             player.size.GetX(),
+                             player.size.GetY(),
+                             PLAYER_COLOR,
+                             PLAYER_COLOR.Fade(0.5f));
 
     // Draw lives (health)
     for (int i = 0; i < player.life; ++i)
@@ -307,7 +309,7 @@ void DrawGame()
     {
       for (int j = 0; j < BRICK_COLUMNS; ++j)
       {
-        if (brick[i][j].active)
+        if (brick[i][j].shouldRender)
         {
           ::DrawRectangleGradientV(brick[i][j].position.GetX() - brickSize.GetX() / 2,
                                    brick[i][j].position.GetY() - brickSize.GetY() / 2,
