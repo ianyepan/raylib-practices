@@ -1,33 +1,50 @@
 #include "../../../raylib-cpp/include/raylib-cpp.hpp"
 #include "raylib.h"
 
-const raylib::Color BG_COLOR{3, 1, 146};
-const int SCREEN_WIDTH = 800;
-const int SCREEN_HEIGHT = 450;
+#include <vector>
 
-auto checkedImage = raylib::Image::GenChecked(SCREEN_WIDTH, SCREEN_HEIGHT, 10, 10, BG_COLOR, BG_COLOR.Fade(0.9f));
-raylib::Texture2D backgroundTexture;
+const int SCREEN_WIDTH = 400;
+const int SCREEN_HEIGHT = 400;
 
 int main(void)
 {
   raylib::Window window{SCREEN_WIDTH, SCREEN_HEIGHT, "Texture practice"};
 
-  ::SetTargetFPS(60);
-
-  // Has to be defined inside main, WHY?
-  backgroundTexture.LoadFromImage(checkedImage);
+  ::SetTargetFPS(120);
 
   raylib::Texture2D zombie{"../images/zombie.png"};
+  // std::vector<float> frameRightBounds{0, 187, 399, 631, 880, 1118, 1424, 1766, 2069, 2327, 2612};
+  std::vector<float> frameRightBounds{880, 1118, 1424, 1766, 2069, 2327, 2612};
+  int frameAmount = (int)frameRightBounds.size() - 1;
+  float frameTopBound = 0;
+  float frameLowBound = zombie.GetHeight();
+  int frameIndex = 0;
+
+  float timer = 0.0f;
 
   while (!window.ShouldClose())
   {
     ::BeginDrawing();
-
     ::ClearBackground(raylib::Color::RayWhite);
 
-    ::DrawTexture(backgroundTexture, 0, 0, WHITE);
+    timer += ::GetFrameTime();
+    if (timer >= 0.1f)
+    {
+      timer = 0.0f;
+      ++frameIndex;
+      frameIndex %= frameAmount;
+    }
 
-    zombie.Draw(raylib::Vector2{0, 0}, raylib::Color::RayWhite);
+    // if (::IsMouseButtonPressed(::MOUSE_LEFT_BUTTON) || ::IsKeyPressed(::KEY_RIGHT) || ::IsKeyPressed(::KEY_ENTER) ||
+    //     IsKeyPressed(::KEY_SPACE))
+    // {
+    //   ++frameIndex;
+    //   frameIndex %= frameAmount;
+    // }
+
+    zombie.Draw(raylib::Rectangle{frameRightBounds[frameIndex], frameTopBound,
+                                  frameRightBounds[frameIndex+1] - frameRightBounds[frameIndex], frameLowBound},
+                raylib::Vector2{10, 10}, raylib::Color::RayWhite);
 
     ::EndDrawing();
   }
