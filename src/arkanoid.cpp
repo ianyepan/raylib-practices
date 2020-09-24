@@ -93,7 +93,7 @@ int main()
 
   InitGame();
 
-  SetTargetFPS(120);
+  ::SetTargetFPS(120);
 
   backgroundTexture.LoadFromImage(checkedImage);
 
@@ -297,7 +297,7 @@ void DrawGame()
 
   ::ClearBackground(raylib::Color::RayWhite);
 
-  ::DrawTexture(backgroundTexture, 0, 0, raylib::Color::White);
+  backgroundTexture.Draw(raylib::Vector2{0, 0}, raylib::Color::White);
 
   if (!gameOver)
   {
