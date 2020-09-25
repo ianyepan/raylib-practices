@@ -1,3 +1,17 @@
+/*******************************************************************************************
+*
+*   raylib Arkanoid - Enhanced Graphics
+*
+*   Original sample game Marc Palau and Ramon Santamaria
+*
+*   This game has been created using raylib v3.0.0 (www.raylib.com)
+*   raylib is licensed under an unmodified zlib/libpng license (View raylib.h for details)
+*
+*   Original Copyright (c) 2015 Ramon Santamaria (@raysan5)
+*   Modified and enhanced 2020 Ian Y.E. Pan (@ianpan870102)
+*
+********************************************************************************************/
+
 #include "raylib.h"
 #include "../include/raylib-cpp.hpp"
 
