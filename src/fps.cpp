@@ -3,7 +3,7 @@
 
 #include <vector>
 
-// Compile command:  g++ main.cpp -lraylib -lGL -lm -lpthread -ldl -lrt -lX11 -std=c++17
+// Compile command:  g++ fps.cpp -lraylib -lGL -lm -lpthread -ldl -lrt -lX11 -std=c++17
 
 const int MAX_COLUMNS = 20;
 const int WIDTH = 1600;
