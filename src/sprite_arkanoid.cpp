@@ -1,24 +1,24 @@
-/*******************************************************************************************
-*
-*   raylib Arkanoid - Enhanced Graphics
-*
-*   Original sample game Marc Palau and Ramon Santamaria
-*
-*   This game has been created using raylib v3.0.0 (www.raylib.com)
-*   raylib is licensed under an unmodified zlib/libpng license (View raylib.h for details)
-*
-*   Original Copyright (c) 2015 Ramon Santamaria (@raysan5)
-*   Modified and enhanced 2020 Ian Y.E. Pan (@ianpan870102)
-*
-********************************************************************************************/
+/************************************************************************************************
+ *
+ *   raylib Arkanoid - Enhanced Graphics
+ *
+ *   Original sample game Marc Palau and Ramon Santamaria
+ *
+ *   This game has been created using raylib v3.0.0 (www.raylib.com)
+ *   raylib is licensed under an unmodified zlib/libpng license (View raylib.h for details)
+ *
+ *   Original Copyright (c) 2015 Ramon Santamaria (@raysan5)
+ *   Modified and enhanced 2020 Ian Y.E. Pan (@ianpan870102)
+ *
+ *   Compile command: g++ sprite_arkanoid.cpp -lraylib -lGL -lm -lpthread -ldl -lrt -lX11 -std=c++17
+ *
+ *************************************************************************************************/
 
-#include "raylib.h"
 #include "../include/raylib-cpp.hpp"
+#include "raylib.h"
 
 #include <cmath>
 #include <vector>
-
-// Compile command: g++ sprite_arkanoid.cpp -lraylib -lGL -lm -lpthread -ldl -lrt -lX11 -std=c++17
 
 const int PLAYER_MAX_LIFE = 5;
 const int BRICK_ROWS = 5;
@@ -105,10 +105,6 @@ int main()
 
   ::SetTargetFPS(120);
 
-  backgroundTexture = ::LoadTexture("../images/hexagon_pattern.png");
-  bricks = ::LoadTexture("../images/bricks.png");
-  player_bar = ::LoadTexture("../images/player_bar.png");
-
   while (!window.ShouldClose())
   {
     UpdateDrawFrame();
@@ -125,7 +121,7 @@ void InitGame()
 
   ball.Init(raylib::Vector2{SCREEN_WIDTH / 2, SCREEN_HEIGHT * 7 / 8 - 30}, (raylib::Vector2){0, 0}, BALL_SIZE, false);
 
-  // Initialize bricks
+  // Initialize bricks positions
   int marginTop = brickSize.GetY() * 2;
 
   for (int i = 0; i < BRICK_ROWS; ++i)
@@ -135,6 +131,11 @@ void InitGame()
       brick[i][j].Init(raylib::Vector2{(j + 0.5f) * brickSize.GetX(), (i + 0.5f) * brickSize.GetY() + marginTop}, true);
     }
   }
+
+  // Load textures
+  backgroundTexture = ::LoadTexture("../images/hexagon_pattern.png");
+  bricks = ::LoadTexture("../images/bricks.png");
+  player_bar = ::LoadTexture("../images/player_bar.png");
 }
 
 // Update game variables (one frame)
@@ -142,7 +143,7 @@ void UpdateGame()
 {
   if (!gameOver)
   {
-    if (::IsKeyPressed('P'))
+    if (::IsKeyPressed(::KEY_P))
     {
       pause = !pause;
     }
