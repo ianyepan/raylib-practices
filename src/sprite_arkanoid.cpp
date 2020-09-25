@@ -30,18 +30,15 @@ const int BALL_SIZE = 12;
 const int BALL_SPEED = 5;
 const int BRICK_WIDTH = 88, BRICK_HEIGHT = 46;
 const std::vector<raylib::Rectangle> BRICK_TEXTURE_POOL{
-    raylib::Rectangle{0, 0, BRICK_WIDTH, BRICK_HEIGHT},
-    raylib::Rectangle{88, 96, BRICK_WIDTH, BRICK_HEIGHT},
-    raylib::Rectangle{264, 51, BRICK_WIDTH, BRICK_HEIGHT},
-    raylib::Rectangle{264, 95, BRICK_WIDTH, BRICK_HEIGHT},
-    raylib::Rectangle{440, 144, BRICK_WIDTH, BRICK_HEIGHT},
-    raylib::Rectangle{176, 145, BRICK_WIDTH, BRICK_HEIGHT},
+    raylib::Rectangle{0, 0, BRICK_WIDTH, BRICK_HEIGHT},     raylib::Rectangle{88, 96, BRICK_WIDTH, BRICK_HEIGHT},
+    raylib::Rectangle{264, 51, BRICK_WIDTH, BRICK_HEIGHT},  raylib::Rectangle{264, 95, BRICK_WIDTH, BRICK_HEIGHT},
+    raylib::Rectangle{440, 144, BRICK_WIDTH, BRICK_HEIGHT}, raylib::Rectangle{176, 145, BRICK_WIDTH, BRICK_HEIGHT},
 };
 
 raylib::Texture2D backgroundTexture;
 raylib::Texture2D bricksTexture;
 raylib::Texture2D playerTexture;
-std::vector<raylib::Rectangle> brickTextures(BRICK_ROWS * BRICK_COLUMNS);
+std::vector<raylib::Rectangle> brickTextures(BRICK_ROWS *BRICK_COLUMNS, raylib::Rectangle());
 
 struct Player
 {
@@ -136,7 +133,7 @@ void InitGame()
 
   for (int i = 0; i < BRICK_ROWS * BRICK_COLUMNS; ++i)
   {
-    brickTextures[i] = BRICK_TEXTURE_POOL[::GetRandomValue(0, (int)BRICK_TEXTURE_POOL.size()-1)];
+    brickTextures[i] = BRICK_TEXTURE_POOL[::GetRandomValue(0, (int)BRICK_TEXTURE_POOL.size() - 1)];
   }
 
   // Load textures
@@ -173,7 +170,7 @@ void UpdateGame()
       player.position.SetX(::GetMouseX());
 
       // Ball launching logic
-      if (!ball.shouldRender && ::IsKeyPressed(::KEY_SPACE))
+      if (!ball.shouldRender && (::IsKeyPressed(::KEY_SPACE) || ::IsMouseButtonPressed(::MOUSE_LEFT_BUTTON)))
       {
         ball.shouldRender = true;
         ball.speed = raylib::Vector2{0, -BALL_SPEED}; // straight up
@@ -338,9 +335,9 @@ void DrawGame()
 
     // Draw player bar
     playerTexture.Draw(raylib::Rectangle{0, 0, 228, 25},
-                    raylib::Vector2{player.position.GetX() - player.size.GetX() / 2,
-                                    player.position.GetY() - player.size.GetY() / 2},
-                    raylib::Color::RayWhite);
+                       raylib::Vector2{player.position.GetX() - player.size.GetX() / 2,
+                                       player.position.GetY() - player.size.GetY() / 2},
+                       raylib::Color::RayWhite);
 
     // Draw ball
     ::DrawCircleGradient(ball.position.GetX(), ball.position.GetY(), ball.radius, raylib::Color::White,
@@ -355,9 +352,9 @@ void DrawGame()
         if (brick[i][j].shouldRender)
         {
           bricksTexture.Draw(brickTextures[k],
-                      raylib::Vector2{brick[i][j].position.GetX() - brickSize.GetX() / 2,
-                                      brick[i][j].position.GetY() - brickSize.GetY() / 2},
-                      raylib::Color::RayWhite);
+                             raylib::Vector2{brick[i][j].position.GetX() - brickSize.GetX() / 2,
+                                             brick[i][j].position.GetY() - brickSize.GetY() / 2},
+                             raylib::Color::RayWhite);
         }
         ++k;
       }
@@ -366,14 +363,14 @@ void DrawGame()
     if (pause)
     {
       ::DrawText("GAME PAUSED", SCREEN_WIDTH / 2 - MeasureText("GAME PAUSED", 40) / 2, SCREEN_HEIGHT / 2 - 40, 40,
-                 GRAY);
+                 raylib::Color::LightGray);
     }
   }
   else // Game over
   {
     ::DrawText("PRESS [ENTER] TO PLAY AGAIN",
                ::GetScreenWidth() / 2 - ::MeasureText("PRESS [ENTER] TO PLAY AGAIN", 20) / 2,
-               ::GetScreenHeight() / 2 - 50, 20, raylib::Color::Gray);
+               ::GetScreenHeight() / 2 - 50, 20, raylib::Color::LightGray);
   }
 
   ::EndDrawing();
