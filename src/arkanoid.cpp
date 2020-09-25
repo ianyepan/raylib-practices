@@ -28,7 +28,7 @@ raylib::Texture2D backgroundTexture;
 
 struct Player
 {
-  raylib::Vector2 position;
+  raylib::Vector2 position; // player bar center
   raylib::Vector2 size;
   int life;
 
@@ -42,7 +42,7 @@ struct Player
 
 struct Ball
 {
-  raylib::Vector2 position;
+  raylib::Vector2 position; // ball center
   raylib::Vector2 speed;
   int radius;
   bool shouldRender;
@@ -58,7 +58,7 @@ struct Ball
 
 struct Brick
 {
-  raylib::Vector2 position;
+  raylib::Vector2 position; // brick center
   bool shouldRender;
 
   void Init(raylib::Vector2 position, bool shouldRender)
@@ -117,8 +117,7 @@ void InitGame()
   {
     for (int j = 0; j < BRICK_COLUMNS; ++j)
     {
-      brick[i][j].Init(raylib::Vector2{j * brickSize.GetX() + brickSize.GetX() / 2, i * brickSize.GetY() + marginTop},
-                       true);
+      brick[i][j].Init(raylib::Vector2{(j + 0.5f) * brickSize.GetX(), (i + 0.5f) * brickSize.GetY() + marginTop}, true);
     }
   }
 }
@@ -206,13 +205,21 @@ void UpdateGame()
       {
         for (int j = 0; j < BRICK_COLUMNS; ++j)
         {
-          if (brick[i][j].shouldRender)
+          Brick currBrick = brick[i][j];
+          if (currBrick.shouldRender)
           {
+            int ballTop = ball.position.GetY() - ball.radius;
+            int ballBottom = ball.position.GetY() + ball.radius;
+            int ballLeft = ball.position.GetX() - ball.radius;
+            int ballRight = ball.position.GetX() + ball.radius;
+            int brickTop = currBrick.position.GetY() - brickSize.GetY() / 2;
+            int brickBottom = currBrick.position.GetY() + brickSize.GetY() / 2;
+            int brickLeft = currBrick.position.GetX() - brickSize.GetX() / 2;
+            int brickRight = currBrick.position.GetX() + brickSize.GetX() / 2;
+
             // Hit below
-            if (((ball.position.GetY() - ball.radius) <= (brick[i][j].position.GetY() + brickSize.GetY() / 2)) &&
-                ((ball.position.GetY() - ball.radius) >
-                 (brick[i][j].position.GetY() + brickSize.GetY() / 2 + ball.speed.GetY())) &&
-                ((std::fabs(ball.position.GetX() - brick[i][j].position.GetX())) <
+            if ((ballTop <= brickBottom) && (ballTop > brickBottom + ball.speed.GetY()) &&
+                (std::fabs(ball.position.GetX() - brick[i][j].position.GetX()) <
                  (brickSize.GetX() / 2 + ball.radius * 2 / 3)) &&
                 (ball.speed.GetY() < 0))
             {
@@ -221,9 +228,7 @@ void UpdateGame()
               ballColorState = COLOR_VECTOR[(i + j) % (int)COLOR_VECTOR.size()];
             }
             // Hit above
-            else if (((ball.position.GetY() + ball.radius) >= (brick[i][j].position.GetY() - brickSize.GetY() / 2)) &&
-                     ((ball.position.GetY() + ball.radius) <
-                      (brick[i][j].position.GetY() - brickSize.GetY() / 2 + ball.speed.GetY())) &&
+            else if ((ballBottom >= brickTop) && (ballBottom < brickTop + ball.speed.GetY()) &&
                      ((std::fabs(ball.position.GetX() - brick[i][j].position.GetX())) <
                       (brickSize.GetX() / 2 + ball.radius * 2 / 3)) &&
                      (ball.speed.GetY() > 0))
@@ -233,9 +238,7 @@ void UpdateGame()
               ballColorState = COLOR_VECTOR[(i + j) % (int)COLOR_VECTOR.size()];
             }
             // Hit left
-            else if (((ball.position.GetX() + ball.radius) >= (brick[i][j].position.GetX() - brickSize.GetX() / 2)) &&
-                     ((ball.position.GetX() + ball.radius) <
-                      (brick[i][j].position.GetX() - brickSize.GetX() / 2 + ball.speed.GetX())) &&
+            else if ((ballRight >= brickLeft) && (ballRight < brickLeft + ball.speed.GetX()) &&
                      ((std::fabs(ball.position.GetY() - brick[i][j].position.GetY())) <
                       (brickSize.GetY() / 2 + ball.radius * 2 / 3)) &&
                      (ball.speed.GetX() > 0))
@@ -245,9 +248,7 @@ void UpdateGame()
               ballColorState = COLOR_VECTOR[(i + j) % (int)COLOR_VECTOR.size()];
             }
             // Hit right
-            else if (((ball.position.GetX() - ball.radius) <= (brick[i][j].position.GetX() + brickSize.GetX() / 2)) &&
-                     ((ball.position.GetX() - ball.radius) >
-                      (brick[i][j].position.GetX() + brickSize.GetX() / 2 + ball.speed.GetX())) &&
+            else if ((ballLeft <= brickRight) && (ballLeft > brickRight + ball.speed.GetX()) &&
                      ((std::fabs(ball.position.GetY() - brick[i][j].position.GetY())) <
                       (brickSize.GetY() / 2 + ball.radius * 2 / 3)) &&
                      (ball.speed.GetX() < 0))
