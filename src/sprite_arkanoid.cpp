@@ -4,26 +4,28 @@
 #include "../../../raylib-cpp/include/raylib-cpp.hpp"
 #include "raylib.h"
 
-// Compile command: g++ arkanoid.cpp -lraylib -lGL -lm -lpthread -ldl -lrt -lX11 -std=c++17
+// Compile command: g++ sprite_arkanoid.cpp -lraylib -lGL -lm -lpthread -ldl -lrt -lX11 -std=c++17
 
 const int PLAYER_MAX_LIFE = 5;
 const int BRICK_ROWS = 5;
-const int BRICK_COLUMNS = 15;
-const int SCREEN_WIDTH = 1000;
+const int BRICK_COLUMNS = 11;
+const int SCREEN_WIDTH = 970;
 const int SCREEN_HEIGHT = 675;
 const int PLAYER_SPEED = 8;
 const int BALL_SIZE = 12;
 const int BALL_SPEED = 5;
 const raylib::Color BG_COLOR{3, 1, 146};
-const std::vector<raylib::Color> COLOR_VECTOR{raylib::Color::Green, raylib::Color::Blue, raylib::Color::Red,
-                                              raylib::Color::Pink, raylib::Color::Gold};
-const std::vector<raylib::Color> TINT_VECTOR{raylib::Color{150, 255, 150}, raylib::Color{150, 150, 255},
-                                             raylib::Color{255, 150, 150}, raylib::Color{255, 100, 255},
-                                             raylib::Color{255, 255, 100}};
-const int NUM_OF_COLORS = (int)COLOR_VECTOR.size();
 
-auto checkedImage = raylib::Image::GenChecked(SCREEN_WIDTH, SCREEN_HEIGHT, 10, 10, BG_COLOR, BG_COLOR.Fade(0.9f));
 raylib::Texture2D backgroundTexture;
+raylib::Texture2D bricks;
+raylib::Texture2D player_bar;
+const int brickWidth = 88, brickHeight = 46;
+const std::vector<raylib::Rectangle> BRICK_VECTOR{
+    raylib::Rectangle{0, 0, brickWidth, brickHeight},
+    raylib::Rectangle{88, 96, brickWidth, brickHeight},
+    raylib::Rectangle{264, 51, brickWidth, brickHeight},
+    raylib::Rectangle{176, 145, brickWidth, brickHeight},
+};
 
 struct Player
 {
@@ -74,7 +76,6 @@ static Player player;
 static Ball ball;
 static Brick brick[BRICK_ROWS][BRICK_COLUMNS];
 static raylib::Vector2 brickSize;
-static raylib::Color ballColorState = raylib::Color::LightGray;
 
 // Function prototypes
 static void InitGame();        // Initialize game
@@ -90,7 +91,11 @@ int main()
 
   ::SetTargetFPS(120);
 
-  backgroundTexture.LoadFromImage(checkedImage);
+  // auto checkedImage = raylib::Image::GenChecked(SCREEN_WIDTH, SCREEN_HEIGHT, 10, 10, BG_COLOR, BG_COLOR.Fade(0.9f));
+  // backgroundTexture.LoadFromImage(checkedImage);
+  backgroundTexture = ::LoadTexture("../images/hexagon_pattern.png");
+  bricks = ::LoadTexture("../images/bricks.png");
+  player_bar = ::LoadTexture("../images/player_bar.png");
 
   while (!window.ShouldClose())
   {
@@ -102,10 +107,9 @@ int main()
 
 void InitGame()
 {
-  brickSize = raylib::Vector2{(float)::GetScreenWidth() / BRICK_COLUMNS, 40};
+  brickSize = raylib::Vector2{brickWidth, brickHeight};
 
-  player.Init(raylib::Vector2{SCREEN_WIDTH / 2, SCREEN_HEIGHT * 7 / 8}, raylib::Vector2{SCREEN_WIDTH / 7, 20},
-              PLAYER_MAX_LIFE);
+  player.Init(raylib::Vector2{SCREEN_WIDTH / 2, SCREEN_HEIGHT * 7 / 8}, raylib::Vector2{228, 25}, PLAYER_MAX_LIFE);
 
   ball.Init(raylib::Vector2{SCREEN_WIDTH / 2, SCREEN_HEIGHT * 7 / 8 - 30}, (raylib::Vector2){0, 0}, BALL_SIZE, false);
 
@@ -224,7 +228,6 @@ void UpdateGame()
             {
               brick[i][j].shouldRender = false;
               ball.speed.SetY(ball.speed.GetY() * -1);
-              ballColorState = COLOR_VECTOR[(i + j) % (int)COLOR_VECTOR.size()];
             }
             // Hit above
             else if ((ballBottom >= brickTop) && (ballBottom < brickTop + ball.speed.GetY()) &&
@@ -234,7 +237,6 @@ void UpdateGame()
             {
               brick[i][j].shouldRender = false;
               ball.speed.SetY(ball.speed.GetY() * -1);
-              ballColorState = COLOR_VECTOR[(i + j) % (int)COLOR_VECTOR.size()];
             }
             // Hit left
             else if ((ballRight >= brickLeft) && (ballRight < brickLeft + ball.speed.GetX()) &&
@@ -244,7 +246,6 @@ void UpdateGame()
             {
               brick[i][j].shouldRender = false;
               ball.speed.SetX(ball.speed.GetX() * -1);
-              ballColorState = COLOR_VECTOR[(i + j) % (int)COLOR_VECTOR.size()];
             }
             // Hit right
             else if ((ballLeft <= brickRight) && (ballLeft > brickRight + ball.speed.GetX()) &&
@@ -254,7 +255,6 @@ void UpdateGame()
             {
               brick[i][j].shouldRender = false;
               ball.speed.SetX(ball.speed.GetX() * -1);
-              ballColorState = COLOR_VECTOR[(i + j) % (int)COLOR_VECTOR.size()];
             }
           }
         }
@@ -299,7 +299,7 @@ void DrawGame()
 
   ::ClearBackground(raylib::Color::RayWhite);
 
-  backgroundTexture.Draw(raylib::Vector2{0, 0}, raylib::Color::White);
+  backgroundTexture.Draw(raylib::Vector2{0, 0}, 0.0f, 5.0f, raylib::Color::White);
 
   if (!gameOver)
   {
@@ -317,12 +317,17 @@ void DrawGame()
     }
 
     // Draw player bar
-    ::DrawRectangleGradientV(player.position.GetX() - player.size.GetX() / 2,
-                             player.position.GetY() - player.size.GetY() / 2, player.size.GetX(), player.size.GetY(),
-                             raylib::Color::LightGray, raylib::Color::DarkGray);
+    player_bar.Draw(raylib::Rectangle{0, 0, 228, 25},
+                    raylib::Vector2{player.position.GetX() - player.size.GetX() / 2,
+                                    player.position.GetY() - player.size.GetY() / 2},
+                    raylib::Color::RayWhite);
+    // ::DrawRectangleGradientV(player.position.GetX() - player.size.GetX() / 2,
+    //                          player.position.GetY() - player.size.GetY() / 2, player.size.GetX(), player.size.GetY(),
+    //                          raylib::Color::LightGray, raylib::Color::DarkGray);
 
     // Draw ball
-    ::DrawCircleGradient(ball.position.GetX(), ball.position.GetY(), ball.radius, raylib::Color::White, ballColorState);
+    ::DrawCircleGradient(ball.position.GetX(), ball.position.GetY(), ball.radius, raylib::Color::White,
+                         raylib::Color::RayWhite);
 
     // Draw bricks
     for (int i = 0; i < BRICK_ROWS; ++i)
@@ -331,14 +336,19 @@ void DrawGame()
       {
         if (brick[i][j].shouldRender)
         {
-          ::DrawRectangleGradientH(brick[i][j].position.GetX() - brickSize.GetX() / 2,
-                                   brick[i][j].position.GetY() - brickSize.GetY() / 2, brickSize.GetX(),
-                                   brickSize.GetY(), COLOR_VECTOR[(i + j) % (int)COLOR_VECTOR.size()],
-                                   TINT_VECTOR[(i + j) % (int)TINT_VECTOR.size()]);
-          ::DrawRectangleLinesEx(raylib::Rectangle{brick[i][j].position.GetX() - brickSize.GetX() / 2,
-                                                   brick[i][j].position.GetY() - brickSize.GetY() / 2, brickSize.GetX(),
-                                                   brickSize.GetY()},
-                                 3, raylib::Color::Black);
+          bricks.Draw(BRICK_VECTOR[(i + j) % (int)BRICK_VECTOR.size()],
+                      raylib::Vector2{brick[i][j].position.GetX() - brickSize.GetX() / 2,
+                                      brick[i][j].position.GetY() - brickSize.GetY() / 2},
+                      raylib::Color::RayWhite);
+
+          // ::DrawRectangleGradientH(brick[i][j].position.GetX() - brickSize.GetX() / 2,
+          //                          brick[i][j].position.GetY() - brickSize.GetY() / 2, brickSize.GetX(),
+          //                          brickSize.GetY(), COLOR_VECTOR[(i + j) % (int)COLOR_VECTOR.size()],
+          //                          TINT_VECTOR[(i + j) % (int)TINT_VECTOR.size()]);
+          // ::DrawRectangleLinesEx(raylib::Rectangle{brick[i][j].position.GetX() - brickSize.GetX() / 2,
+          //                                          brick[i][j].position.GetY() - brickSize.GetY() / 2,
+          //                                          brickSize.GetX(), brickSize.GetY()},
+          //                        3, raylib::Color::Black);
         }
       }
     }
