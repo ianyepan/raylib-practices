@@ -1,8 +1,8 @@
+#include "raylib.h"
+#include "../include/raylib-cpp.hpp"
+
 #include <cmath>
 #include <vector>
-
-#include "../../../raylib-cpp/include/raylib-cpp.hpp"
-#include "raylib.h"
 
 // Compile command: g++ sprite_arkanoid.cpp -lraylib -lGL -lm -lpthread -ldl -lrt -lX11 -std=c++17
 
@@ -91,8 +91,6 @@ int main()
 
   ::SetTargetFPS(120);
 
-  // auto checkedImage = raylib::Image::GenChecked(SCREEN_WIDTH, SCREEN_HEIGHT, 10, 10, BG_COLOR, BG_COLOR.Fade(0.9f));
-  // backgroundTexture.LoadFromImage(checkedImage);
   backgroundTexture = ::LoadTexture("../images/hexagon_pattern.png");
   bricks = ::LoadTexture("../images/bricks.png");
   player_bar = ::LoadTexture("../images/player_bar.png");
