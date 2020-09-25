@@ -20,7 +20,7 @@
 #include <cmath>
 #include <vector>
 
-const int PLAYER_MAX_LIFE = 5;
+const int PLAYER_MAX_LIFE = 3;
 const int BRICK_ROWS = 5;
 const int BRICK_COLUMNS = 11;
 const int SCREEN_WIDTH = 970;
@@ -28,18 +28,20 @@ const int SCREEN_HEIGHT = 675;
 const int PLAYER_SPEED = 8;
 const int BALL_SIZE = 12;
 const int BALL_SPEED = 5;
-const raylib::Color BG_COLOR{3, 1, 146};
+const int BRICK_WIDTH = 88, BRICK_HEIGHT = 46;
+const std::vector<raylib::Rectangle> BRICK_TEXTURE_POOL{
+    raylib::Rectangle{0, 0, BRICK_WIDTH, BRICK_HEIGHT},
+    raylib::Rectangle{88, 96, BRICK_WIDTH, BRICK_HEIGHT},
+    raylib::Rectangle{264, 51, BRICK_WIDTH, BRICK_HEIGHT},
+    raylib::Rectangle{264, 95, BRICK_WIDTH, BRICK_HEIGHT},
+    raylib::Rectangle{440, 144, BRICK_WIDTH, BRICK_HEIGHT},
+    raylib::Rectangle{176, 145, BRICK_WIDTH, BRICK_HEIGHT},
+};
 
 raylib::Texture2D backgroundTexture;
-raylib::Texture2D bricks;
-raylib::Texture2D player_bar;
-const int brickWidth = 88, brickHeight = 46;
-const std::vector<raylib::Rectangle> BRICK_VECTOR{
-    raylib::Rectangle{0, 0, brickWidth, brickHeight},
-    raylib::Rectangle{88, 96, brickWidth, brickHeight},
-    raylib::Rectangle{264, 51, brickWidth, brickHeight},
-    raylib::Rectangle{176, 145, brickWidth, brickHeight},
-};
+raylib::Texture2D bricksTexture;
+raylib::Texture2D playerTexture;
+std::vector<raylib::Rectangle> brickTextures(BRICK_ROWS * BRICK_COLUMNS);
 
 struct Player
 {
@@ -115,13 +117,13 @@ int main()
 
 void InitGame()
 {
-  brickSize = raylib::Vector2{brickWidth, brickHeight};
+  brickSize = raylib::Vector2{BRICK_WIDTH, BRICK_HEIGHT};
 
   player.Init(raylib::Vector2{SCREEN_WIDTH / 2, SCREEN_HEIGHT * 7 / 8}, raylib::Vector2{228, 25}, PLAYER_MAX_LIFE);
 
   ball.Init(raylib::Vector2{SCREEN_WIDTH / 2, SCREEN_HEIGHT * 7 / 8 - 30}, (raylib::Vector2){0, 0}, BALL_SIZE, false);
 
-  // Initialize bricks positions
+  // Initialize bricks
   int marginTop = brickSize.GetY() * 2;
 
   for (int i = 0; i < BRICK_ROWS; ++i)
@@ -132,10 +134,15 @@ void InitGame()
     }
   }
 
+  for (int i = 0; i < BRICK_ROWS * BRICK_COLUMNS; ++i)
+  {
+    brickTextures[i] = BRICK_TEXTURE_POOL[::GetRandomValue(0, (int)BRICK_TEXTURE_POOL.size()-1)];
+  }
+
   // Load textures
   backgroundTexture = ::LoadTexture("../images/hexagon_pattern.png");
-  bricks = ::LoadTexture("../images/bricks.png");
-  player_bar = ::LoadTexture("../images/player_bar.png");
+  bricksTexture = ::LoadTexture("../images/bricks.png");
+  playerTexture = ::LoadTexture("../images/player_bar.png");
 }
 
 // Update game variables (one frame)
@@ -330,39 +337,29 @@ void DrawGame()
     }
 
     // Draw player bar
-    player_bar.Draw(raylib::Rectangle{0, 0, 228, 25},
+    playerTexture.Draw(raylib::Rectangle{0, 0, 228, 25},
                     raylib::Vector2{player.position.GetX() - player.size.GetX() / 2,
                                     player.position.GetY() - player.size.GetY() / 2},
                     raylib::Color::RayWhite);
-    // ::DrawRectangleGradientV(player.position.GetX() - player.size.GetX() / 2,
-    //                          player.position.GetY() - player.size.GetY() / 2, player.size.GetX(), player.size.GetY(),
-    //                          raylib::Color::LightGray, raylib::Color::DarkGray);
 
     // Draw ball
     ::DrawCircleGradient(ball.position.GetX(), ball.position.GetY(), ball.radius, raylib::Color::White,
                          raylib::Color::RayWhite);
 
     // Draw bricks
+    int k = 0;
     for (int i = 0; i < BRICK_ROWS; ++i)
     {
       for (int j = 0; j < BRICK_COLUMNS; ++j)
       {
         if (brick[i][j].shouldRender)
         {
-          bricks.Draw(BRICK_VECTOR[(i + j) % (int)BRICK_VECTOR.size()],
+          bricksTexture.Draw(brickTextures[k],
                       raylib::Vector2{brick[i][j].position.GetX() - brickSize.GetX() / 2,
                                       brick[i][j].position.GetY() - brickSize.GetY() / 2},
                       raylib::Color::RayWhite);
-
-          // ::DrawRectangleGradientH(brick[i][j].position.GetX() - brickSize.GetX() / 2,
-          //                          brick[i][j].position.GetY() - brickSize.GetY() / 2, brickSize.GetX(),
-          //                          brickSize.GetY(), COLOR_VECTOR[(i + j) % (int)COLOR_VECTOR.size()],
-          //                          TINT_VECTOR[(i + j) % (int)TINT_VECTOR.size()]);
-          // ::DrawRectangleLinesEx(raylib::Rectangle{brick[i][j].position.GetX() - brickSize.GetX() / 2,
-          //                                          brick[i][j].position.GetY() - brickSize.GetY() / 2,
-          //                                          brickSize.GetX(), brickSize.GetY()},
-          //                        3, raylib::Color::Black);
         }
+        ++k;
       }
     }
 
