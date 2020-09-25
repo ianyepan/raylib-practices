@@ -1,15 +1,11 @@
-#include "../../../raylib-cpp/include/raylib-cpp.hpp"
-#include "raylib.h"
-
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
-
 #include <cmath>
 #include <vector>
 
-// Compile command: g++ arkanoid.cpp -lraylib -lGL -lm -lpthread -ldl -lrt -lX11 -std=c++17
+#include "../../../raylib-cpp/include/raylib-cpp.hpp"
+#include "raylib.h"
+
+// Compile command: g++ arkanoid.cpp -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
+// -std=c++17
 
 const int PLAYER_MAX_LIFE = 5;
 const int BRICK_ROWS = 5;
@@ -18,7 +14,7 @@ const int SCREEN_WIDTH = 1000;
 const int SCREEN_HEIGHT = 675;
 const int PLAYER_SPEED = 8;
 const int BALL_SIZE = 12;
-const int BALL_SPEED = 4;
+const int BALL_SPEED = 5;
 const raylib::Color BG_COLOR{3, 1, 146};
 const std::vector<raylib::Color> COLOR_VECTOR{raylib::Color::Green, raylib::Color::Blue, raylib::Color::Red,
                                               raylib::Color::Pink, raylib::Color::Gold};
@@ -140,31 +136,25 @@ void UpdateGame()
     if (!pause)
     {
       // Player movement logic
-      if (::IsKeyDown(::KEY_LEFT))
-      {
-        player.position.SetX(player.position.GetX() - PLAYER_SPEED);
-      }
-      if ((player.position.x - player.size.x / 2) <= 0)
-      {
-        player.position.SetX(player.size.GetX() / 2);
-      }
-      if (::IsKeyDown(::KEY_RIGHT))
-      {
-        player.position.SetX(player.position.GetX() + PLAYER_SPEED);
-      }
-      if ((player.position.x + player.size.x / 2) >= SCREEN_WIDTH)
-      {
-        player.position.SetX(SCREEN_WIDTH - player.size.GetX() / 2);
-      }
+
+      // if (::IsKeyDown(::KEY_LEFT) && (player.position.GetX() -
+      // player.size.GetX() / 2) > 0)
+      // {
+      //   player.position.SetX(player.position.GetX() - PLAYER_SPEED);
+      // }
+      // else if (::IsKeyDown(::KEY_RIGHT) && (player.position.GetX() +
+      // player.size.GetX() / 2) < SCREEN_WIDTH)
+      // {
+      //   player.position.SetX(player.position.GetX() + PLAYER_SPEED);
+      // }
+
+      player.position.SetX(::GetMouseX());
 
       // Ball launching logic
-      if (!ball.shouldRender)
+      if (!ball.shouldRender && ::IsKeyPressed(::KEY_SPACE))
       {
-        if (::IsKeyPressed(::KEY_SPACE))
-        {
-          ball.shouldRender = true;
-          ball.speed = raylib::Vector2{0, -BALL_SPEED}; // straight up
-        }
+        ball.shouldRender = true;
+        ball.speed = raylib::Vector2{0, -BALL_SPEED}; // straight up
       }
 
       // Ball movement logic
@@ -219,40 +209,48 @@ void UpdateGame()
           if (brick[i][j].shouldRender)
           {
             // Hit below
-            if (((ball.position.y - ball.radius) <= (brick[i][j].position.y + brickSize.y / 2)) &&
-                ((ball.position.y - ball.radius) > (brick[i][j].position.y + brickSize.y / 2 + ball.speed.y)) &&
-                ((fabs(ball.position.x - brick[i][j].position.x)) < (brickSize.x / 2 + ball.radius * 2 / 3)) &&
-                (ball.speed.y < 0))
+            if (((ball.position.GetY() - ball.radius) <= (brick[i][j].position.GetY() + brickSize.GetY() / 2)) &&
+                ((ball.position.GetY() - ball.radius) >
+                 (brick[i][j].position.GetY() + brickSize.GetY() / 2 + ball.speed.GetY())) &&
+                ((std::fabs(ball.position.GetX() - brick[i][j].position.GetX())) <
+                 (brickSize.GetX() / 2 + ball.radius * 2 / 3)) &&
+                (ball.speed.GetY() < 0))
             {
               brick[i][j].shouldRender = false;
               ball.speed.SetY(ball.speed.GetY() * -1);
               ballColorState = COLOR_VECTOR[(i + j) % (int)COLOR_VECTOR.size()];
             }
             // Hit above
-            else if (((ball.position.y + ball.radius) >= (brick[i][j].position.y - brickSize.y / 2)) &&
-                     ((ball.position.y + ball.radius) < (brick[i][j].position.y - brickSize.y / 2 + ball.speed.y)) &&
-                     ((fabs(ball.position.x - brick[i][j].position.x)) < (brickSize.x / 2 + ball.radius * 2 / 3)) &&
-                     (ball.speed.y > 0))
+            else if (((ball.position.GetY() + ball.radius) >= (brick[i][j].position.GetY() - brickSize.GetY() / 2)) &&
+                     ((ball.position.GetY() + ball.radius) <
+                      (brick[i][j].position.GetY() - brickSize.GetY() / 2 + ball.speed.GetY())) &&
+                     ((std::fabs(ball.position.GetX() - brick[i][j].position.GetX())) <
+                      (brickSize.GetX() / 2 + ball.radius * 2 / 3)) &&
+                     (ball.speed.GetY() > 0))
             {
               brick[i][j].shouldRender = false;
               ball.speed.SetY(ball.speed.GetY() * -1);
               ballColorState = COLOR_VECTOR[(i + j) % (int)COLOR_VECTOR.size()];
             }
             // Hit left
-            else if (((ball.position.x + ball.radius) >= (brick[i][j].position.x - brickSize.x / 2)) &&
-                     ((ball.position.x + ball.radius) < (brick[i][j].position.x - brickSize.x / 2 + ball.speed.x)) &&
-                     ((fabs(ball.position.y - brick[i][j].position.y)) < (brickSize.y / 2 + ball.radius * 2 / 3)) &&
-                     (ball.speed.x > 0))
+            else if (((ball.position.GetX() + ball.radius) >= (brick[i][j].position.GetX() - brickSize.GetX() / 2)) &&
+                     ((ball.position.GetX() + ball.radius) <
+                      (brick[i][j].position.GetX() - brickSize.GetX() / 2 + ball.speed.GetX())) &&
+                     ((std::fabs(ball.position.GetY() - brick[i][j].position.GetY())) <
+                      (brickSize.GetY() / 2 + ball.radius * 2 / 3)) &&
+                     (ball.speed.GetX() > 0))
             {
               brick[i][j].shouldRender = false;
               ball.speed.SetX(ball.speed.GetX() * -1);
               ballColorState = COLOR_VECTOR[(i + j) % (int)COLOR_VECTOR.size()];
             }
             // Hit right
-            else if (((ball.position.x - ball.radius) <= (brick[i][j].position.x + brickSize.x / 2)) &&
-                     ((ball.position.x - ball.radius) > (brick[i][j].position.x + brickSize.x / 2 + ball.speed.x)) &&
-                     ((fabs(ball.position.y - brick[i][j].position.y)) < (brickSize.y / 2 + ball.radius * 2 / 3)) &&
-                     (ball.speed.x < 0))
+            else if (((ball.position.GetX() - ball.radius) <= (brick[i][j].position.GetX() + brickSize.GetX() / 2)) &&
+                     ((ball.position.GetX() - ball.radius) >
+                      (brick[i][j].position.GetX() + brickSize.GetX() / 2 + ball.speed.GetX())) &&
+                     ((std::fabs(ball.position.GetY() - brick[i][j].position.GetY())) <
+                      (brickSize.GetY() / 2 + ball.radius * 2 / 3)) &&
+                     (ball.speed.GetX() < 0))
             {
               brick[i][j].shouldRender = false;
               ball.speed.SetX(ball.speed.GetX() * -1);
@@ -342,8 +340,10 @@ void DrawGame()
     }
 
     if (pause)
+    {
       ::DrawText("GAME PAUSED", SCREEN_WIDTH / 2 - MeasureText("GAME PAUSED", 40) / 2, SCREEN_HEIGHT / 2 - 40, 40,
                  GRAY);
+    }
   }
   else // Game over
   {
