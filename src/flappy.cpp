@@ -7,6 +7,8 @@
 const int MAX_TUBES = 100;
 const int FLAPPY_RADIUS = 22;
 const int TUBES_WIDTH = 50;
+const int GRAVITY = 1;
+const int JUMP_HEIGHT = 1;
 
 struct Flappy
 {
@@ -31,15 +33,15 @@ static const int SCREEN_WIDTH = 800;
 static const int SCREEN_HEIGHT = 450;
 static const int TUBE_SPEED = 1;
 
-static bool gameOver = false;
-static bool pause = false;
+static bool isGameOver = false;
+static bool isPaused = false;
 static int score = 0;
 static int hiScore = 0;
 
 static Flappy flappy{raylib::Vector2{80, (float)(SCREEN_HEIGHT / 2 - FLAPPY_RADIUS)}, FLAPPY_RADIUS,
                      raylib::Color::DarkGray};
 static std::vector<Tubes> tubes(MAX_TUBES * 2);
-static std::vector<Vector2> tubesPos(MAX_TUBES);
+static std::vector<raylib::Vector2> tubesPos(MAX_TUBES);
 
 raylib::Texture2D backgroundTexture;
 raylib::Texture2D flappyTexture;
@@ -68,43 +70,45 @@ void InitGame()
   backgroundTexture = ::LoadTexture("../images/flappy_background.png");
   flappyTexture = ::LoadTexture("../images/flappy_bird.png");
 
+  score = 0;
+  isGameOver = false;
+  isPaused = false;
+
+  // TODO: how?
   for (int i = 0; i < MAX_TUBES; ++i)
   {
-    tubesPos[i].x = 400 + 280 * i;
-    tubesPos[i].y = -GetRandomValue(0, 120);
+    tubesPos[i].SetX(400 + 280 * i);
+    tubesPos[i].SetY(-GetRandomValue(0, 120));
   }
 
+  // TODO: how?
   for (int i = 0; i < MAX_TUBES * 2; i += 2)
   {
-    tubes[i].rec.x = tubesPos[i / 2].x;
-    tubes[i].rec.y = tubesPos[i / 2].y;
-    tubes[i].rec.width = TUBES_WIDTH;
-    tubes[i].rec.height = GetRandomValue(200, 240);
+    tubes[i].rec.SetX(tubesPos[i / 2].GetX());
+    tubes[i].rec.SetY(tubesPos[i / 2].GetY());
+    tubes[i].rec.SetWidth(TUBES_WIDTH);
+    tubes[i].rec.SetHeight(GetRandomValue(220, 245));
 
-    tubes[i + 1].rec.x = tubesPos[i / 2].x;
-    tubes[i + 1].rec.y = 600 + tubesPos[i / 2].y - 255;
-    tubes[i + 1].rec.width = TUBES_WIDTH;
-    tubes[i + 1].rec.height = tubes[i].rec.height;
+    tubes[i + 1].rec.SetX(tubesPos[i / 2].GetX());
+    tubes[i + 1].rec.SetY(600 + tubesPos[i / 2].y - 255);
+    tubes[i + 1].rec.SetWidth(TUBES_WIDTH);
+    tubes[i + 1].rec.SetHeight(tubes[i].rec.GetHeight());
 
     tubes[i / 2].active = true;
   }
-
-  score = 0;
-  gameOver = false;
-  pause = false;
 }
 
 // Update game (one frame)
 void UpdateGame()
 {
-  if (!gameOver)
+  if (!isGameOver)
   {
     if (::IsKeyPressed(KEY_P))
     {
-      pause = !pause;
+      isPaused = !isPaused;
     }
 
-    if (!pause)
+    if (!isPaused)
     {
       for (int i = 0; i < MAX_TUBES; ++i)
       {
@@ -117,13 +121,13 @@ void UpdateGame()
         tubes[i + 1].rec.x = tubesPos[i / 2].x;
       }
 
-      if (::IsKeyDown(KEY_SPACE) && !gameOver)
+      if (::IsKeyDown(KEY_SPACE) && !isGameOver)
       {
-        flappy.position.y -= 1;
+        flappy.position.y -= JUMP_HEIGHT;
       }
       else
       {
-        flappy.position.y += 1;
+        flappy.position.y += GRAVITY;
       }
 
       // Check Collisions
@@ -131,10 +135,10 @@ void UpdateGame()
       {
         if (CheckCollisionCircleRec(flappy.position, flappy.radius, tubes[i].rec))
         {
-          gameOver = true;
-          pause = false;
+          isGameOver = true;
+          isPaused = false;
         }
-        else if ((tubesPos[i / 2].x < flappy.position.x) && tubes[i / 2].active && !gameOver)
+        else if ((tubesPos[i / 2].x < flappy.position.x) && tubes[i / 2].active && !isGameOver)
         {
           score += 100;
           tubes[i / 2].active = false;
@@ -146,7 +150,7 @@ void UpdateGame()
   else if (IsKeyPressed(KEY_ENTER))
   {
     InitGame();
-    gameOver = false;
+    isGameOver = false;
   }
 }
 
@@ -156,7 +160,7 @@ void DrawGame()
   ::BeginDrawing();
   ::ClearBackground(raylib::Color::RayWhite);
 
-  if (!gameOver)
+  if (!isGameOver)
   {
     backgroundTexture.Draw(raylib::Vector2{0, 0}, 0.0f, 0.8f, raylib::Color::White);
 
@@ -184,7 +188,7 @@ void DrawGame()
     ::DrawText(TextFormat("%04i", score), 20, 20, 40, raylib::Color::White);
     ::DrawText(TextFormat("HI-SCORE: %04i", hiScore), 20, 70, 20, raylib::Color::White);
 
-    if (pause)
+    if (isPaused)
     {
       ::DrawText("GAME PAUSED", SCREEN_WIDTH / 2 - MeasureText("GAME PAUSED", 40) / 2, SCREEN_HEIGHT / 2 - 40, 40,
                  raylib::Color::White);
