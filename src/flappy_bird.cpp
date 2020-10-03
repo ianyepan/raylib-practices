@@ -45,6 +45,7 @@ static std::vector<raylib::Vector2> tubesPos(MAX_TUBES);
 
 raylib::Texture2D backgroundTexture;
 raylib::Texture2D flappyTexture;
+raylib::Texture2D tubeTexture;
 
 static void InitGame();
 static void UpdateGame();
@@ -69,6 +70,7 @@ void InitGame()
 {
   backgroundTexture = ::LoadTexture("../assets/flappy_background.png");
   flappyTexture = ::LoadTexture("../assets/flappy_bird.png");
+  tubeTexture = ::LoadTexture("../assets/flappy_tube.png");
 
   score = 0;
   isGameOver = false;
@@ -78,7 +80,8 @@ void InitGame()
   for (int i = 0; i < MAX_TUBES; ++i)
   {
     tubesPos[i].SetX(400 + 280 * i);
-    tubesPos[i].SetY(-GetRandomValue(0, 120));
+    // tubesPos[i].SetY(-GetRandomValue(0, 120));
+    tubesPos[i].SetY(0);
   }
 
   // TODO: how?
@@ -173,16 +176,21 @@ void DrawGame()
     // Draw tubes
     for (int i = 0; i < MAX_TUBES; ++i)
     {
-      ::DrawRectangleGradientH(tubes[i * 2].rec.x, tubes[i * 2].rec.y, tubes[i * 2].rec.width, tubes[i * 2].rec.height,
-                               raylib::Color{115, 190, 45}, raylib::Color{159, 228, 85});
-      ::DrawRectangleGradientH(tubes[i * 2 + 1].rec.x, tubes[i * 2 + 1].rec.y, tubes[i * 2 + 1].rec.width,
-                               tubes[i * 2 + 1].rec.height, raylib::Color{115, 190, 45}, raylib::Color{159, 228, 85});
-      ::DrawRectangleLinesEx(
-          raylib::Rectangle{tubes[i * 2].rec.x, tubes[i * 2].rec.y, tubes[i * 2].rec.width, tubes[i * 2].rec.height}, 2,
-          raylib::Color::Black);
-      ::DrawRectangleLinesEx(raylib::Rectangle{tubes[i * 2 + 1].rec.x, tubes[i * 2 + 1].rec.y,
-                                               tubes[i * 2 + 1].rec.width, tubes[i * 2 + 1].rec.height},
-                             2, raylib::Color::Black);
+      // ::DrawRectangle(tubes[i * 2].rec.x, tubes[i * 2].rec.y, tubes[i * 2].rec.width, tubes[i * 2].rec.height,
+      //                          raylib::Color::Maroon);
+      // ::DrawRectangle(tubes[i * 2 + 1].rec.x, tubes[i * 2 + 1].rec.y, tubes[i * 2 + 1].rec.width,
+      //                          tubes[i * 2 + 1].rec.height, raylib::Color::Maroon);
+      // ::DrawRectangleLinesEx(
+      //     raylib::Rectangle{tubes[i * 2].rec.x, tubes[i * 2].rec.y, tubes[i * 2].rec.width, tubes[i * 2].rec.height}, 2,
+      //     raylib::Color::Black);
+      // ::DrawRectangleLinesEx(raylib::Rectangle{tubes[i * 2 + 1].rec.x, tubes[i * 2 + 1].rec.y,
+      //                                          tubes[i * 2 + 1].rec.width, tubes[i * 2 + 1].rec.height},
+      //                        2, raylib::Color::Black);
+
+      tubeTexture.Draw(raylib::Vector2{tubes[i * 2].rec.x + TUBES_WIDTH, tubes[i * 2].rec.y + tubes[i * 2].rec.height},
+                       180.0f, 0.7f, raylib::Color::White);
+      tubeTexture.Draw(raylib::Vector2{tubes[i * 2 + 1].rec.x, tubes[i * 2 + 1].rec.y}, 0.0f, 0.7f,
+                       raylib::Color::White);
     }
 
     ::DrawText(TextFormat("%04i", score), 20, 20, 40, raylib::Color::White);

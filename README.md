@@ -7,9 +7,13 @@ practice programming and working with basic graphics in C++.
 
 ### Screenshots
 
-<p align="center">
-  <img src="./screenshots/arkanoid_gameplay.png" width="400"/>
-</p>
+#### Flappy Bird Clone
+
+<img src="./screenshots/flappy_bird.png" width="400"/>
+
+#### Classic Arkanoid Remake
+
+<img src="./screenshots/arkanoid_gameplay.png" width="400"/>
 
 <!-- ![alt text](./screenshots/arkanoid_gameplay.png) -->
 
