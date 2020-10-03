@@ -8,7 +8,7 @@ const int MAX_TUBES = 100;
 const int FLAPPY_RADIUS = 22;
 const int TUBES_WIDTH = 50;
 const int GRAVITY = 1;
-const int JUMP_HEIGHT = 1;
+const float JUMP_HEIGHT = 1.5f;
 
 struct Flappy
 {
@@ -67,8 +67,8 @@ int main()
 
 void InitGame()
 {
-  backgroundTexture = ::LoadTexture("../images/flappy_background.png");
-  flappyTexture = ::LoadTexture("../images/flappy_bird.png");
+  backgroundTexture = ::LoadTexture("../assets/flappy_background.png");
+  flappyTexture = ::LoadTexture("../assets/flappy_bird.png");
 
   score = 0;
   isGameOver = false;
@@ -121,7 +121,7 @@ void UpdateGame()
         tubes[i + 1].rec.x = tubesPos[i / 2].x;
       }
 
-      if (::IsKeyDown(KEY_SPACE) && !isGameOver)
+      if (::IsKeyDown(::KEY_SPACE) && !isGameOver)
       {
         flappy.position.y -= JUMP_HEIGHT;
       }
@@ -147,7 +147,7 @@ void UpdateGame()
       }
     }
   }
-  else if (IsKeyPressed(KEY_ENTER))
+  else if (::IsKeyPressed(::KEY_ENTER))
   {
     InitGame();
     isGameOver = false;

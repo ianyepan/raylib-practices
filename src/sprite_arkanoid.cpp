@@ -137,9 +137,9 @@ void InitGame()
   }
 
   // Load textures
-  backgroundTexture = ::LoadTexture("../images/hexagon_pattern.png");
-  bricksTexture = ::LoadTexture("../images/bricks.png");
-  playerTexture = ::LoadTexture("../images/player_bar.png");
+  backgroundTexture = ::LoadTexture("../assets/hexagon_pattern.png");
+  bricksTexture = ::LoadTexture("../assets/bricks.png");
+  playerTexture = ::LoadTexture("../assets/player_bar.png");
 }
 
 // Update game variables (one frame)
