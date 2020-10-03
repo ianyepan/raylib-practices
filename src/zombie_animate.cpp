@@ -8,7 +8,7 @@ const int SCREEN_HEIGHT = 400;
 
 int main(void)
 {
-  raylib::Window window{SCREEN_WIDTH, SCREEN_HEIGHT, "Texture practice"};
+  raylib::Window window{SCREEN_WIDTH, SCREEN_HEIGHT, "Zombie Running"};
 
   ::SetTargetFPS(120);
 
