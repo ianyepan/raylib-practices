@@ -68,7 +68,7 @@ int main()
 
 void InitGame()
 {
-  backgroundTexture = ::LoadTexture("../assets/flappy_background.png");
+  backgroundTexture = ::LoadTexture("../assets/flappy_bg.png");
   flappyTexture = ::LoadTexture("../assets/flappy_bird.png");
   tubeTexture = ::LoadTexture("../assets/flappy_tube.png");
 
@@ -165,7 +165,7 @@ void DrawGame()
 
   if (!isGameOver)
   {
-    backgroundTexture.Draw(raylib::Vector2{0, 0}, 0.0f, 0.8f, raylib::Color::White);
+    backgroundTexture.Draw(raylib::Vector2{0, 0}, 0.0f, 0.5f, raylib::Color::White);
 
     // flappy.position.DrawCircle(flappy.radius, flappy.color);
     raylib::Vector2 adjustedFlappyPosition{flappy.position.GetX() - flappy.radius,
@@ -188,9 +188,9 @@ void DrawGame()
       //                        2, raylib::Color::Black);
 
       tubeTexture.Draw(raylib::Vector2{tubes[i * 2].rec.x + TUBES_WIDTH, tubes[i * 2].rec.y + tubes[i * 2].rec.height},
-                       180.0f, 0.7f, raylib::Color::White);
+                       180.0f, 0.7f, raylib::Color::Pink);
       tubeTexture.Draw(raylib::Vector2{tubes[i * 2 + 1].rec.x, tubes[i * 2 + 1].rec.y}, 0.0f, 0.7f,
-                       raylib::Color::White);
+                       raylib::Color::Pink);
     }
 
     ::DrawText(TextFormat("%04i", score), 20, 20, 40, raylib::Color::White);
@@ -204,7 +204,7 @@ void DrawGame()
   }
   else
   {
-    backgroundTexture.Draw(raylib::Vector2{0, 0}, 0.0f, 0.8f, raylib::Color::Gray);
+    backgroundTexture.Draw(raylib::Vector2{0, 0}, 0.0f, 0.5f, raylib::Color::Gray);
 
     ::DrawText("PRESS [ENTER] TO PLAY AGAIN", GetScreenWidth() / 2 - MeasureText("PRESS [ENTER] TO PLAY AGAIN", 25) / 2,
                GetScreenHeight() / 2 - 50, 25, raylib::Color::White);
