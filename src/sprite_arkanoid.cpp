@@ -17,8 +17,8 @@
 #include "../include/raylib-cpp.hpp"
 #include "raylib.h"
 
+#include <array>
 #include <cmath>
-#include <vector>
 
 const int PLAYER_MAX_LIFE = 3;
 const int BRICK_ROWS = 5;
@@ -29,7 +29,7 @@ const int PLAYER_SPEED = 8;
 const int BALL_SIZE = 12;
 const int BALL_SPEED = 5;
 const int BRICK_WIDTH = 88, BRICK_HEIGHT = 46;
-const std::vector<raylib::Rectangle> BRICK_TEXTURE_POOL{
+const std::array<raylib::Rectangle, 6> BRICK_TEXTURE_POOL{
     raylib::Rectangle{0, 0, BRICK_WIDTH, BRICK_HEIGHT},     raylib::Rectangle{88, 96, BRICK_WIDTH, BRICK_HEIGHT},
     raylib::Rectangle{264, 51, BRICK_WIDTH, BRICK_HEIGHT},  raylib::Rectangle{264, 95, BRICK_WIDTH, BRICK_HEIGHT},
     raylib::Rectangle{440, 144, BRICK_WIDTH, BRICK_HEIGHT}, raylib::Rectangle{176, 145, BRICK_WIDTH, BRICK_HEIGHT},
@@ -38,7 +38,7 @@ const std::vector<raylib::Rectangle> BRICK_TEXTURE_POOL{
 raylib::Texture2D backgroundTexture;
 raylib::Texture2D bricksTexture;
 raylib::Texture2D playerTexture;
-std::vector<raylib::Rectangle> brickTextures(BRICK_ROWS *BRICK_COLUMNS, raylib::Rectangle());
+std::array<raylib::Rectangle, BRICK_ROWS * BRICK_COLUMNS> brickTextures;
 
 struct Player
 {

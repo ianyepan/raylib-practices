@@ -2,7 +2,7 @@
 #include "raylib.h"
 
 #include <algorithm>
-#include <vector>
+#include <array>
 
 const int MAX_TUBES = 100;
 const int FLAPPY_RADIUS = 22;
@@ -40,8 +40,8 @@ static int hiScore = 0;
 
 static Flappy flappy{raylib::Vector2{80, (float)(SCREEN_HEIGHT / 2 - FLAPPY_RADIUS)}, FLAPPY_RADIUS,
                      raylib::Color::DarkGray};
-static std::vector<Tubes> tubes(MAX_TUBES * 2);
-static std::vector<raylib::Vector2> tubesPos(MAX_TUBES);
+static std::array<Tubes, MAX_TUBES * 2> tubes;
+static std::array<raylib::Vector2, MAX_TUBES> tubesPos;
 
 raylib::Texture2D backgroundTexture;
 raylib::Texture2D flappyTexture;
@@ -80,8 +80,7 @@ void InitGame()
   for (int i = 0; i < MAX_TUBES; ++i)
   {
     tubesPos[i].SetX(400 + 280 * i);
-    // tubesPos[i].SetY(-GetRandomValue(0, 120));
-    tubesPos[i].SetY(0);
+    tubesPos[i].SetY(-GetRandomValue(0, 120));
   }
 
   // TODO: how?
@@ -101,7 +100,7 @@ void InitGame()
   }
 }
 
-// Update game (one frame)
+// Update game variables for a frame
 void UpdateGame()
 {
   if (!isGameOver)
@@ -157,7 +156,7 @@ void UpdateGame()
   }
 }
 
-// Draw game (one frame)
+// Draw game for one frame
 void DrawGame()
 {
   ::BeginDrawing();
@@ -181,8 +180,8 @@ void DrawGame()
       // ::DrawRectangle(tubes[i * 2 + 1].rec.x, tubes[i * 2 + 1].rec.y, tubes[i * 2 + 1].rec.width,
       //                          tubes[i * 2 + 1].rec.height, raylib::Color::Maroon);
       // ::DrawRectangleLinesEx(
-      //     raylib::Rectangle{tubes[i * 2].rec.x, tubes[i * 2].rec.y, tubes[i * 2].rec.width, tubes[i * 2].rec.height}, 2,
-      //     raylib::Color::Black);
+      //     raylib::Rectangle{tubes[i * 2].rec.x, tubes[i * 2].rec.y, tubes[i * 2].rec.width, tubes[i * 2].rec.height},
+      //     2, raylib::Color::Black);
       // ::DrawRectangleLinesEx(raylib::Rectangle{tubes[i * 2 + 1].rec.x, tubes[i * 2 + 1].rec.y,
       //                                          tubes[i * 2 + 1].rec.width, tubes[i * 2 + 1].rec.height},
       //                        2, raylib::Color::Black);

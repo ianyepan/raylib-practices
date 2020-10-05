@@ -1,7 +1,7 @@
 #include "../../../raylib-cpp/include/raylib-cpp.hpp"
 #include "raylib.h"
 
-#include <vector>
+#include <array>
 
 // Compile command:  g++ fps.cpp -lraylib -lGL -lm -lpthread -ldl -lrt -lX11 -std=c++17
 
@@ -43,16 +43,13 @@ int main()
   raylib::Window window(WIDTH, HEIGHT, "Raylib-CPP First Person");
   raylib::Color background(RAYWHITE);
 
-  raylib::Camera3D camera(raylib::Vector3(4.0f, 2.0f, 4.0f),
-                          raylib::Vector3(0.0f, 1.8f, 0.0f),
-                          raylib::Vector3(0.0f, 1.0f, 0.0f),
-                          60.0f,
-                          CAMERA_PERSPECTIVE);
+  raylib::Camera3D camera(raylib::Vector3(4.0f, 2.0f, 4.0f), raylib::Vector3(0.0f, 1.8f, 0.0f),
+                          raylib::Vector3(0.0f, 1.0f, 0.0f), 60.0f, CAMERA_PERSPECTIVE);
 
   // Generates some random columns
-  std::vector<float> heights(MAX_COLUMNS); // float heights[MAX_COLUMNS] = {0.0f};
-  std::vector<raylib::Vector3> positions(MAX_COLUMNS);
-  std::vector<raylib::Color> colors(MAX_COLUMNS);
+  std::array<float, MAX_COLUMNS> heights;
+  std::array<raylib::Vector3, MAX_COLUMNS> positions;
+  std::array<raylib::Color, MAX_COLUMNS> colors;
 
   for (int i = 0; i < MAX_COLUMNS; ++i)
   {

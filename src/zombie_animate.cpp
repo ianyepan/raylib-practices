@@ -1,7 +1,7 @@
 #include "../../../raylib-cpp/include/raylib-cpp.hpp"
 #include "raylib.h"
 
-#include <vector>
+#include <array>
 
 const int SCREEN_WIDTH = 400;
 const int SCREEN_HEIGHT = 400;
@@ -13,8 +13,8 @@ int main()
   ::SetTargetFPS(120);
 
   raylib::Texture2D zombie{"../assets/zombie.png"};
-  // std::vector<float> frameRightBounds{0, 187, 399, 631, 880, 1118, 1424, 1766, 2069, 2327, 2612};
-  std::vector<float> frameRightBounds{880, 1118, 1424, 1766, 2069, 2327, 2612};
+  // std::array<float, 11> frameRightBounds{0, 187, 399, 631, 880, 1118, 1424, 1766, 2069, 2327, 2612};
+  std::array<float, 7> frameRightBounds{880, 1118, 1424, 1766, 2069, 2327, 2612};
   int frameAmount = (int)frameRightBounds.size() - 1;
   float frameTopBound = 0;
   float frameLowBound = zombie.GetHeight();
