@@ -6,8 +6,8 @@
 const int NUM_BULLETS = 50;
 const int NUM_MAX_ENEMIES = 50;
 const int FIRST_WAVE_ENEMIES = 10;
-const int SECOND_WAVE_ENEMIES = 10;
-const int THIRD_WAVE_ENEMIES = 10;
+const int SECOND_WAVE_ENEMIES = 20;
+const int THIRD_WAVE_ENEMIES = 50;
 
 enum EnemyWave
 {
@@ -62,11 +62,12 @@ static float alpha = 0.0f;
 
 static int activeEnemies = FIRST_WAVE_ENEMIES;
 static int enemyKills = 0;
-static bool smooth = false;
+static bool isOpaque = false;
 
 static void InitGame();
-static void tuneSmooth();
+static void tuneAlpha();
 static void UpdateGame();
+static void announceWave(EnemyWave wave);
 static void DrawGame();
 static void UpdateDrawFrame();
 
@@ -102,7 +103,6 @@ void InitGame()
   // Initialize bullets
   for (auto &bullet : bullets)
   {
-    // bullet.rec = std::move(raylib::Rectangle{player.rec.x, player.rec.y + player.rec.height / 4, 10, 5});
     bullet.rec.x = player.rec.x;
     bullet.rec.y = player.rec.y + player.rec.height / 4;
     bullet.rec.width = 10;
@@ -114,18 +114,17 @@ void InitGame()
   }
 }
 
-void tuneSmooth()
+void tuneAlpha()
 {
-  if (!smooth)
+  if (!isOpaque)
   {
     alpha += 0.02f;
     if (alpha >= 1.0f)
     {
-      smooth = true;
+      isOpaque = true;
     }
   }
-
-  if (smooth)
+  else
   {
     alpha -= 0.02f;
   }
@@ -143,7 +142,7 @@ void UpdateGame()
     {
       if (wave == FIRST_WAVE)
       {
-        tuneSmooth();
+        tuneAlpha();
 
         if (enemyKills == activeEnemies)
         {
@@ -156,13 +155,13 @@ void UpdateGame()
 
           activeEnemies = SECOND_WAVE_ENEMIES;
           wave = SECOND_WAVE;
-          smooth = false;
+          isOpaque = false; // so that text can fade in upon next wave
           alpha = 0.0f;
         }
       }
       else if (wave == SECOND_WAVE)
       {
-        tuneSmooth();
+        tuneAlpha();
 
         if (enemyKills == activeEnemies)
         {
@@ -176,13 +175,13 @@ void UpdateGame()
 
           activeEnemies = THIRD_WAVE_ENEMIES;
           wave = THIRD_WAVE;
-          smooth = false;
+          isOpaque = false; // so that text can fade in upon next wave
           alpha = 0.0f;
         }
       }
       else if (wave == THIRD_WAVE)
       {
-        tuneSmooth();
+        tuneAlpha();
 
         if (enemyKills == activeEnemies)
         {
@@ -311,6 +310,25 @@ void UpdateGame()
   }
 }
 
+void announceWave(EnemyWave wave)
+{
+  if (wave == FIRST_WAVE)
+  {
+    ::DrawText("FIRST WAVE", SCREEN_WIDTH / 2 - MeasureText("FIRST WAVE", 40) / 2, SCREEN_HEIGHT / 2 - 40, 40,
+               Fade(raylib::Color::White, alpha));
+  }
+  else if (wave == SECOND_WAVE)
+  {
+    ::DrawText("SECOND WAVE", SCREEN_WIDTH / 2 - MeasureText("SECOND WAVE", 40) / 2, SCREEN_HEIGHT / 2 - 40, 40,
+               Fade(raylib::Color::White, alpha));
+  }
+  else if (wave == THIRD_WAVE)
+  {
+    ::DrawText("THIRD WAVE", SCREEN_WIDTH / 2 - MeasureText("THIRD WAVE", 40) / 2, SCREEN_HEIGHT / 2 - 40, 40,
+               Fade(raylib::Color::White, alpha));
+  }
+}
+
 // Draw each frame
 void DrawGame()
 {
@@ -321,21 +339,7 @@ void DrawGame()
   {
     player.rec.Draw(player.color);
 
-    if (wave == FIRST_WAVE)
-    {
-      ::DrawText("FIRST WAVE", SCREEN_WIDTH / 2 - MeasureText("FIRST WAVE", 40) / 2, SCREEN_HEIGHT / 2 - 40, 40,
-                 Fade(raylib::Color::White, alpha));
-    }
-    else if (wave == SECOND_WAVE)
-    {
-      ::DrawText("SECOND WAVE", SCREEN_WIDTH / 2 - MeasureText("SECOND WAVE", 40) / 2, SCREEN_HEIGHT / 2 - 40, 40,
-                 Fade(raylib::Color::White, alpha));
-    }
-    else if (wave == THIRD_WAVE)
-    {
-      ::DrawText("THIRD WAVE", SCREEN_WIDTH / 2 - MeasureText("THIRD WAVE", 40) / 2, SCREEN_HEIGHT / 2 - 40, 40,
-                 Fade(raylib::Color::White, alpha));
-    }
+    announceWave(wave);
 
     for (int i = 0; i < activeEnemies; ++i)
     {
@@ -362,16 +366,17 @@ void DrawGame()
 
     if (isPaused)
     {
-      ::DrawText("GAME PAUSED", SCREEN_WIDTH / 2 - MeasureText("GAME PAUSED", 40) / 2, SCREEN_HEIGHT / 2 - 40, 40, GRAY);
+      ::DrawText("GAME PAUSED", SCREEN_WIDTH / 2 - MeasureText("GAME PAUSED", 40) / 2, SCREEN_HEIGHT / 2 - 40, 40,
+                 GRAY);
     }
   }
   else
   {
     ::DrawText("PRESS [ENTER] TO PLAY AGAIN", GetScreenWidth() / 2 - MeasureText("PRESS [ENTER] TO PLAY AGAIN", 20) / 2,
-             GetScreenHeight() / 2 - 50, 20, GRAY);
+               GetScreenHeight() / 2 - 50, 20, GRAY);
   }
 
-  EndDrawing();
+  ::EndDrawing();
 }
 
 // Update and Draw (one frame)
