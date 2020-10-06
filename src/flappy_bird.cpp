@@ -38,6 +38,9 @@ static bool isPaused = false;
 static int score = 0;
 static int hiScore = 0;
 
+static float alpha = 0.0f;
+static bool isOpaque = false;
+
 static Flappy flappy{raylib::Vector2{80, (float)(SCREEN_HEIGHT / 2 - FLAPPY_RADIUS)}, FLAPPY_RADIUS,
                      raylib::Color::DarkGray};
 static std::array<Tubes, MAX_TUBES * 2> tubes;
@@ -49,6 +52,8 @@ raylib::Texture2D tubeTexture;
 
 static void InitGame();
 static void UpdateGame();
+static void tuneAlpha();
+static void announceGame();
 static void DrawGame();
 static void UpdateDrawFrame();
 
@@ -73,17 +78,13 @@ void InitGame()
   tubeTexture = ::LoadTexture("../assets/flappy_tube.png");
 
   score = 0;
-  isGameOver = false;
-  isPaused = false;
 
-  // TODO: how?
   for (int i = 0; i < MAX_TUBES; ++i)
   {
     tubesPos[i].SetX(400 + 280 * i);
     tubesPos[i].SetY(-GetRandomValue(0, 120));
   }
 
-  // TODO: how?
   for (int i = 0; i < MAX_TUBES * 2; i += 2)
   {
     tubes[i].rec.SetX(tubesPos[i / 2].GetX());
@@ -103,6 +104,7 @@ void InitGame()
 // Update game variables for a frame
 void UpdateGame()
 {
+  tuneAlpha();
   if (!isGameOver)
   {
     if (::IsKeyPressed(KEY_P))
@@ -154,6 +156,29 @@ void UpdateGame()
     InitGame();
     isGameOver = false;
   }
+}
+
+void tuneAlpha()
+{
+  if (!isOpaque)
+  {
+    alpha += 0.01f;
+    if (alpha >= 1.0f)
+    {
+      isOpaque = true;
+    }
+  }
+  else
+  {
+    alpha -= 0.005f;
+  }
+}
+
+void announceGame()
+{
+  const char *msg = "Welcome To Flappy Bird!";
+  ::DrawText(msg, SCREEN_WIDTH / 2 - MeasureText(msg, 40) / 2, SCREEN_HEIGHT / 2 - 40, 40,
+             Fade(raylib::Color::White, alpha));
 }
 
 // Draw game for one frame
@@ -208,6 +233,8 @@ void DrawGame()
     ::DrawText("PRESS [ENTER] TO PLAY AGAIN", GetScreenWidth() / 2 - MeasureText("PRESS [ENTER] TO PLAY AGAIN", 25) / 2,
                GetScreenHeight() / 2 - 50, 25, raylib::Color::White);
   }
+
+  announceGame();
 
   ::EndDrawing();
 }
