@@ -3,23 +3,17 @@
 
 #include <array>
 
-//----------------------------------------------------------------------------------
-// Some Defines
-//----------------------------------------------------------------------------------
 const int NUM_BULLETS = 50;
 const int NUM_MAX_ENEMIES = 50;
-const int FIRST_WAVE = 10;
-const int SECOND_WAVE = 20;
-const int THIRD_WAVE = 50;
+const int FIRST_WAVE_ENEMIES = 10;
+const int SECOND_WAVE_ENEMIES = 10;
+const int THIRD_WAVE_ENEMIES = 10;
 
-//----------------------------------------------------------------------------------
-// Types and Structures Definition
-//----------------------------------------------------------------------------------
 enum EnemyWave
 {
-  FIRST = 0,
-  SECOND,
-  THIRD
+  FIRST_WAVE,
+  SECOND_WAVE,
+  THIRD_WAVE
 };
 
 struct Player
@@ -50,9 +44,6 @@ struct Bullet
   raylib::Color color;
 };
 
-//------------------------------------------------------------------------------------
-// Global Variables Declaration
-//------------------------------------------------------------------------------------
 static const int SCREEN_WIDTH = 800;
 static const int SCREEN_HEIGHT = 450;
 
@@ -61,19 +52,20 @@ static bool isPaused = false;
 static int score = 0;
 static bool victory = false;
 
-static Player player{raylib::Rectangle{20,50,20,20},raylib::Vector2{5,5}, raylib::Color::Black};
-static std::array<Enemy, NUM_MAX_ENEMIES> enemy;
-static std::array<Bullet, NUM_BULLETS> bullet;
-static EnemyWave wave;
+static Player player{raylib::Rectangle{20, 50, 20, 20}, raylib::Vector2{5, 5}, raylib::Color::White};
+static std::array<Enemy, NUM_MAX_ENEMIES> enemies;
+static std::array<Bullet, NUM_BULLETS> bullets;
+static EnemyWave wave = FIRST_WAVE;
 
 static int bulletRate = 0;
 static float alpha = 0.0f;
 
-static int activeEnemies = 0;
-static int enemiesKill = 0;
+static int activeEnemies = FIRST_WAVE_ENEMIES;
+static int enemyKills = 0;
 static bool smooth = false;
 
 static void InitGame();
+static void tuneSmooth();
 static void UpdateGame();
 static void DrawGame();
 static void UpdateDrawFrame();
@@ -95,29 +87,47 @@ int main()
 void InitGame()
 {
   // Initialize enemies
-  for (int i = 0; i < NUM_MAX_ENEMIES; i++)
+  for (auto &enemy : enemies)
   {
-    enemy[i].rec.width = 10;
-    enemy[i].rec.height = 10;
-    enemy[i].rec.x = GetRandomValue(SCREEN_WIDTH, SCREEN_WIDTH + 1000);
-    enemy[i].rec.y = GetRandomValue(0, SCREEN_HEIGHT - enemy[i].rec.height);
-    enemy[i].speed.x = 5;
-    enemy[i].speed.y = 5;
-    enemy[i].active = true;
-    enemy[i].color = GRAY;
+    enemy.rec.width = 10;
+    enemy.rec.height = 10;
+    enemy.rec.x = GetRandomValue(SCREEN_WIDTH, SCREEN_WIDTH + 1000);
+    enemy.rec.y = GetRandomValue(0, SCREEN_HEIGHT - enemy.rec.height);
+    enemy.speed.x = 5;
+    enemy.speed.y = 5;
+    enemy.active = true;
+    enemy.color = raylib::Color::LightGray;
   }
 
   // Initialize bullets
-  for (int i = 0; i < NUM_BULLETS; i++)
+  for (auto &bullet : bullets)
   {
-    bullet[i].rec.x = player.rec.x;
-    bullet[i].rec.y = player.rec.y + player.rec.height / 4;
-    bullet[i].rec.width = 10;
-    bullet[i].rec.height = 5;
-    bullet[i].speed.x = 7;
-    bullet[i].speed.y = 0;
-    bullet[i].active = false;
-    bullet[i].color = MAROON;
+    // bullet.rec = std::move(raylib::Rectangle{player.rec.x, player.rec.y + player.rec.height / 4, 10, 5});
+    bullet.rec.x = player.rec.x;
+    bullet.rec.y = player.rec.y + player.rec.height / 4;
+    bullet.rec.width = 10;
+    bullet.rec.height = 5;
+    bullet.speed.x = 7;
+    bullet.speed.y = 0;
+    bullet.active = false;
+    bullet.color = raylib::Color::Yellow;
+  }
+}
+
+void tuneSmooth()
+{
+  if (!smooth)
+  {
+    alpha += 0.02f;
+    if (alpha >= 1.0f)
+    {
+      smooth = true;
+    }
+  }
+
+  if (smooth)
+  {
+    alpha -= 0.02f;
   }
 }
 
@@ -131,171 +141,158 @@ void UpdateGame()
 
     if (!isPaused)
     {
-      switch (wave)
+      if (wave == FIRST_WAVE)
       {
-      case FIRST: {
-        if (!smooth)
+        tuneSmooth();
+
+        if (enemyKills == activeEnemies)
         {
-          alpha += 0.02f;
+          enemyKills = 0;
 
-          if (alpha >= 1.0f)
-            smooth = true;
-        }
-
-        if (smooth)
-          alpha -= 0.02f;
-
-        if (enemiesKill == activeEnemies)
-        {
-          enemiesKill = 0;
-
-          for (int i = 0; i < activeEnemies; i++)
+          for (int i = 0; i < activeEnemies; ++i)
           {
-            if (!enemy[i].active)
-              enemy[i].active = true;
+            enemies[i].active = true;
           }
 
-          activeEnemies = SECOND_WAVE;
-          wave = SECOND;
+          activeEnemies = SECOND_WAVE_ENEMIES;
+          wave = SECOND_WAVE;
           smooth = false;
           alpha = 0.0f;
         }
       }
-      break;
-      case SECOND: {
-        if (!smooth)
+      else if (wave == SECOND_WAVE)
+      {
+        tuneSmooth();
+
+        if (enemyKills == activeEnemies)
         {
-          alpha += 0.02f;
+          enemyKills = 0;
 
-          if (alpha >= 1.0f)
-            smooth = true;
-        }
-
-        if (smooth)
-          alpha -= 0.02f;
-
-        if (enemiesKill == activeEnemies)
-        {
-          enemiesKill = 0;
-
-          for (int i = 0; i < activeEnemies; i++)
+          for (int i = 0; i < activeEnemies; ++i)
           {
-            if (!enemy[i].active)
-              enemy[i].active = true;
+            if (!enemies[i].active)
+              enemies[i].active = true;
           }
 
-          activeEnemies = THIRD_WAVE;
-          wave = THIRD;
+          activeEnemies = THIRD_WAVE_ENEMIES;
+          wave = THIRD_WAVE;
           smooth = false;
           alpha = 0.0f;
         }
       }
-      break;
-      case THIRD: {
-        if (!smooth)
+      else if (wave == THIRD_WAVE)
+      {
+        tuneSmooth();
+
+        if (enemyKills == activeEnemies)
         {
-          alpha += 0.02f;
-
-          if (alpha >= 1.0f)
-            smooth = true;
-        }
-
-        if (smooth)
-          alpha -= 0.02f;
-
-        if (enemiesKill == activeEnemies)
           victory = true;
-      }
-      break;
-      default:
-        break;
+        }
       }
 
       // Player movement
       if (IsKeyDown(KEY_RIGHT))
-        player.rec.x += player.speed.x;
-      if (IsKeyDown(KEY_LEFT))
-        player.rec.x -= player.speed.x;
-      if (IsKeyDown(KEY_UP))
-        player.rec.y -= player.speed.y;
-      if (IsKeyDown(KEY_DOWN))
-        player.rec.y += player.speed.y;
-
-      // Player collision with enemy
-      for (int i = 0; i < activeEnemies; i++)
       {
-        if (CheckCollisionRecs(player.rec, enemy[i].rec))
+        player.rec.x += player.speed.x;
+      }
+      if (IsKeyDown(KEY_LEFT))
+      {
+        player.rec.x -= player.speed.x;
+      }
+      if (IsKeyDown(KEY_UP))
+      {
+        player.rec.y -= player.speed.y;
+      }
+      if (IsKeyDown(KEY_DOWN))
+      {
+        player.rec.y += player.speed.y;
+      }
+
+      // Player collision with enemies
+      for (int i = 0; i < activeEnemies; ++i)
+      {
+        if (CheckCollisionRecs(player.rec, enemies[i].rec))
+        {
           isGameOver = true;
+        }
       }
 
       // Enemy behaviour
-      for (int i = 0; i < activeEnemies; i++)
+      for (int i = 0; i < activeEnemies; ++i)
       {
-        if (enemy[i].active)
+        if (enemies[i].active)
         {
-          enemy[i].rec.x -= enemy[i].speed.x;
+          enemies[i].rec.x -= enemies[i].speed.x;
 
-          if (enemy[i].rec.x < 0)
+          if (enemies[i].rec.x < 0)
           {
-            enemy[i].rec.x = GetRandomValue(SCREEN_WIDTH, SCREEN_WIDTH + 1000);
-            enemy[i].rec.y = GetRandomValue(0, SCREEN_HEIGHT - enemy[i].rec.height);
+            enemies[i].rec.x = GetRandomValue(SCREEN_WIDTH, SCREEN_WIDTH + 1000);
+            enemies[i].rec.y = GetRandomValue(0, SCREEN_HEIGHT - enemies[i].rec.height);
           }
         }
       }
 
       // Wall behaviour
       if (player.rec.x <= 0)
+      {
         player.rec.x = 0;
+      }
       if (player.rec.x + player.rec.width >= SCREEN_WIDTH)
+      {
         player.rec.x = SCREEN_WIDTH - player.rec.width;
+      }
       if (player.rec.y <= 0)
+      {
         player.rec.y = 0;
+      }
       if (player.rec.y + player.rec.height >= SCREEN_HEIGHT)
+      {
         player.rec.y = SCREEN_HEIGHT - player.rec.height;
+      }
 
       // Bullet initialization
       if (IsKeyDown(KEY_SPACE))
       {
         bulletRate += 5;
 
-        for (int i = 0; i < NUM_BULLETS; i++)
+        for (int i = 0; i < NUM_BULLETS; ++i)
         {
-          if (!bullet[i].active && bulletRate % 20 == 0)
+          if (!bullets[i].active && bulletRate % 20 == 0)
           {
-            bullet[i].rec.x = player.rec.x;
-            bullet[i].rec.y = player.rec.y + player.rec.height / 4;
-            bullet[i].active = true;
+            bullets[i].rec.x = player.rec.x;
+            bullets[i].rec.y = player.rec.y + player.rec.height / 4;
+            bullets[i].active = true;
             break;
           }
         }
       }
 
       // Bullet logic
-      for (int i = 0; i < NUM_BULLETS; i++)
+      for (int i = 0; i < NUM_BULLETS; ++i)
       {
-        if (bullet[i].active)
+        if (bullets[i].active)
         {
           // Movement
-          bullet[i].rec.x += bullet[i].speed.x;
+          bullets[i].rec.x += bullets[i].speed.x;
 
-          // Collision with enemy
-          for (int j = 0; j < activeEnemies; j++)
+          // Collision with enemies
+          for (int j = 0; j < activeEnemies; ++j)
           {
-            if (enemy[j].active)
+            if (enemies[j].active)
             {
-              if (CheckCollisionRecs(bullet[i].rec, enemy[j].rec))
+              if (CheckCollisionRecs(bullets[i].rec, enemies[j].rec))
               {
-                bullet[i].active = false;
-                enemy[j].rec.x = GetRandomValue(SCREEN_WIDTH, SCREEN_WIDTH + 1000);
-                enemy[j].rec.y = GetRandomValue(0, SCREEN_HEIGHT - enemy[j].rec.height);
+                bullets[i].active = false;
+                enemies[j].rec.x = GetRandomValue(SCREEN_WIDTH, SCREEN_WIDTH + 1000);
+                enemies[j].rec.y = GetRandomValue(0, SCREEN_HEIGHT - enemies[j].rec.height);
                 bulletRate = 0;
-                enemiesKill++;
+                ++enemyKills;
                 score += 100;
               }
 
-              if (bullet[i].rec.x + bullet[i].rec.width >= SCREEN_WIDTH)
+              if (bullets[i].rec.x + bullets[i].rec.width >= SCREEN_WIDTH)
               {
-                bullet[i].active = false;
+                bullets[i].active = false;
                 bulletRate = 0;
               }
             }
@@ -318,55 +315,61 @@ void UpdateGame()
 void DrawGame()
 {
   ::BeginDrawing();
-  ::ClearBackground(raylib::Color::RayWhite);
+  ::ClearBackground(raylib::Color::Black);
 
   if (!isGameOver)
   {
     player.rec.Draw(player.color);
 
-    if (wave == FIRST)
+    if (wave == FIRST_WAVE)
     {
       ::DrawText("FIRST WAVE", SCREEN_WIDTH / 2 - MeasureText("FIRST WAVE", 40) / 2, SCREEN_HEIGHT / 2 - 40, 40,
-               Fade(BLACK, alpha));
+                 Fade(raylib::Color::White, alpha));
     }
-    else if (wave == SECOND)
+    else if (wave == SECOND_WAVE)
     {
       ::DrawText("SECOND WAVE", SCREEN_WIDTH / 2 - MeasureText("SECOND WAVE", 40) / 2, SCREEN_HEIGHT / 2 - 40, 40,
-               Fade(BLACK, alpha));
+                 Fade(raylib::Color::White, alpha));
     }
-    else if (wave == THIRD)
+    else if (wave == THIRD_WAVE)
     {
       ::DrawText("THIRD WAVE", SCREEN_WIDTH / 2 - MeasureText("THIRD WAVE", 40) / 2, SCREEN_HEIGHT / 2 - 40, 40,
-               Fade(BLACK, alpha));
+                 Fade(raylib::Color::White, alpha));
     }
 
-    for (int i = 0; i < activeEnemies; i++)
+    for (int i = 0; i < activeEnemies; ++i)
     {
-      if (enemy[i].active)
+      if (enemies[i].active)
       {
-        enemy[i].rec.Draw(enemy[i].color);
+        enemies[i].rec.Draw(enemies[i].color);
       }
     }
 
-    for (int i = 0; i < NUM_BULLETS; i++)
+    for (auto &bullet : bullets)
     {
-      if (bullet[i].active)
+      if (bullet.active)
       {
-        bullet[i].rec.Draw(bullet[i].color);
+        bullet.rec.Draw(bullet.color);
       }
     }
 
-    DrawText(TextFormat("%04i", score), 20, 20, 40, GRAY);
+    ::DrawText(::TextFormat("%04i", score), 20, 20, 40, GRAY);
 
     if (victory)
-      DrawText("YOU WIN", SCREEN_WIDTH / 2 - MeasureText("YOU WIN", 40) / 2, SCREEN_HEIGHT / 2 - 40, 40, BLACK);
+    {
+      ::DrawText("YOU WIN", SCREEN_WIDTH / 2 - MeasureText("YOU WIN", 40) / 2, SCREEN_HEIGHT / 2 - 40, 40, WHITE);
+    }
 
     if (isPaused)
-      DrawText("GAME PAUSED", SCREEN_WIDTH / 2 - MeasureText("GAME PAUSED", 40) / 2, SCREEN_HEIGHT / 2 - 40, 40, GRAY);
+    {
+      ::DrawText("GAME PAUSED", SCREEN_WIDTH / 2 - MeasureText("GAME PAUSED", 40) / 2, SCREEN_HEIGHT / 2 - 40, 40, GRAY);
+    }
   }
   else
-    DrawText("PRESS [ENTER] TO PLAY AGAIN", GetScreenWidth() / 2 - MeasureText("PRESS [ENTER] TO PLAY AGAIN", 20) / 2,
+  {
+    ::DrawText("PRESS [ENTER] TO PLAY AGAIN", GetScreenWidth() / 2 - MeasureText("PRESS [ENTER] TO PLAY AGAIN", 20) / 2,
              GetScreenHeight() / 2 - 50, 20, GRAY);
+  }
 
   EndDrawing();
 }
