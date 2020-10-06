@@ -5,7 +5,7 @@
 #include <array>
 
 const int MAX_TUBES = 100;
-const int FLAPPY_RADIUS = 22;
+const int FLAPPY_RADIUS = 18;
 const int TUBES_WIDTH = 50;
 const int GRAVITY = 1;
 const float JUMP_HEIGHT = 1.5f;
@@ -167,8 +167,8 @@ void DrawGame()
     backgroundTexture.Draw(raylib::Vector2{0, 0}, 0.0f, 0.5f, raylib::Color::White);
 
     // flappy.position.DrawCircle(flappy.radius, flappy.color);
-    raylib::Vector2 adjustedFlappyPosition{flappy.position.GetX() - flappy.radius,
-                                           flappy.position.GetY() - flappy.radius - 2};
+    raylib::Vector2 adjustedFlappyPosition{flappy.position.GetX() - flappy.radius - 2,
+                                           flappy.position.GetY() - flappy.radius - 6};
 
     flappyTexture.Draw(adjustedFlappyPosition, 0.0f, 0.4f, raylib::Color::White);
 
