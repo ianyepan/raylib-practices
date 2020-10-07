@@ -46,9 +46,9 @@ static Flappy flappy{raylib::Vector2{80, (float)(SCREEN_HEIGHT / 2 - FLAPPY_RADI
 static std::array<Tubes, MAX_TUBES * 2> tubes;
 static std::array<raylib::Vector2, MAX_TUBES> tubesPos;
 
-raylib::Texture2D backgroundTexture;
-raylib::Texture2D flappyTexture;
-raylib::Texture2D tubeTexture;
+static raylib::Texture2D backgroundTexture;
+static raylib::Texture2D flappyTexture;
+static raylib::Texture2D tubeTexture;
 
 static void InitGame();
 static void UpdateGame();

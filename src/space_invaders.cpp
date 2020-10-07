@@ -1,13 +1,24 @@
 #include "../include/raylib-cpp.hpp"
 #include "raylib.h"
 
+#include <algorithm>
 #include <array>
 
+static const int SCREEN_WIDTH = 1200;
+static const int SCREEN_HEIGHT = 700;
+
 const int NUM_BULLETS = 50;
-const int NUM_MAX_ENEMIES = 50;
-const int FIRST_WAVE_ENEMIES = 10;
-const int SECOND_WAVE_ENEMIES = 20;
-const int THIRD_WAVE_ENEMIES = 50;
+const int NUM_MAX_ENEMIES = 70;
+const int FIRST_WAVE_ENEMIES = 25;
+const int SECOND_WAVE_ENEMIES = 40;
+const int THIRD_WAVE_ENEMIES = NUM_MAX_ENEMIES;
+const int PLAYER_HEIGHT = 50;
+const int PLAYER_WIDTH = 20;
+const int ENEMY_HEIGHT = 35;
+const int ENEMY_WIDTH = 45;
+const std::array<raylib::Color, 3> ENEMY_COLOR_POOL{
+  raylib::Color{238,237,49}, raylib::Color{243,49,242}, raylib::Color{38,233,235}
+};
 
 enum EnemyWave
 {
@@ -22,6 +33,7 @@ struct Player
   raylib::Vector2 speed;
   raylib::Color color;
 
+  Player() = default;
   Player(raylib::Rectangle _rec, raylib::Vector2 _speed, raylib::Color _color) : rec{_rec}, speed{_speed}, color{_color}
   {
   }
@@ -30,28 +42,36 @@ struct Player
 struct Enemy
 {
   raylib::Rectangle rec;
-  raylib::Vector2 speed;
+  int speed;
   bool active;
   raylib::Color color;
+
+  Enemy() = default;
+  Enemy(raylib::Rectangle _rec, int _speed, bool _active, raylib::Color _color)
+      : rec{_rec}, speed{_speed}, active{_active}, color{_color}
+  {
+  }
 };
 
 struct Bullet
 {
   raylib::Rectangle rec;
-  raylib::Vector2 speed;
+  int speed;
   bool active;
   raylib::Color color;
+  Bullet() = default;
+  Bullet(raylib::Rectangle _rec, int _speed, bool _active, raylib::Color _color)
+      : rec{_rec}, speed{_speed}, active{_active}, color{_color}
+  {
+  }
 };
-
-static const int SCREEN_WIDTH = 800;
-static const int SCREEN_HEIGHT = 450;
 
 static bool isGameOver = false;
 static bool isPaused = false;
 static int score = 0;
 static bool victory = false;
 
-static Player player{raylib::Rectangle{20, 50, 20, 20}, raylib::Vector2{5, 5}, raylib::Color::White};
+static Player player{raylib::Rectangle{20, 50, PLAYER_WIDTH, PLAYER_HEIGHT}, raylib::Vector2{3, 3}, raylib::Color::White};
 static std::array<Enemy, NUM_MAX_ENEMIES> enemies;
 static std::array<Bullet, NUM_BULLETS> bullets;
 static EnemyWave wave = FIRST_WAVE;
@@ -62,6 +82,10 @@ static float alpha = 0.0f;
 static int activeEnemies = FIRST_WAVE_ENEMIES;
 static int enemyKills = 0;
 static bool isOpaque = false;
+
+raylib::Texture2D playerTexture;
+raylib::Texture2D enemyTexture;
+raylib::Texture2D enemyTexture2;
 
 static void InitGame();
 static void tuneAlpha();
@@ -75,7 +99,7 @@ int main()
 {
   raylib::Window window{SCREEN_WIDTH, SCREEN_HEIGHT, "Sample game: Space Invaders"};
   InitGame();
-  SetTargetFPS(60);
+  SetTargetFPS(120);
 
   while (!window.ShouldClose())
   {
@@ -87,30 +111,26 @@ int main()
 
 void InitGame()
 {
+  playerTexture = ::LoadTexture("../assets/space_player.png");
+  enemyTexture = ::LoadTexture("../assets/space_enemy.png");
+  enemyTexture2 = ::LoadTexture("../assets/space_enemy2.png");
+
   // Initialize enemies
   for (auto &enemy : enemies)
   {
-    enemy.rec.x = GetRandomValue(SCREEN_WIDTH, SCREEN_WIDTH + 1000);
-    enemy.rec.y = GetRandomValue(0, SCREEN_HEIGHT - enemy.rec.height);
-    enemy.rec.width = 10;
-    enemy.rec.height = 10;
-    enemy.speed.x = 5;
-    enemy.speed.y = 5;
-    enemy.active = true;
-    enemy.color = raylib::Color::LightGray;
+    raylib::Rectangle enemyRec{(float)GetRandomValue(SCREEN_WIDTH, SCREEN_WIDTH + 1000),
+                               (float)GetRandomValue(0, SCREEN_HEIGHT - ENEMY_HEIGHT), ENEMY_WIDTH, ENEMY_HEIGHT};
+    int enemySpeed = 2;
+    auto enemyColor = ENEMY_COLOR_POOL[::GetRandomValue(0, (int)ENEMY_COLOR_POOL.size())];
+    enemy = Enemy{enemyRec, enemySpeed, true, enemyColor};
   }
 
   // Initialize bullets
   for (auto &bullet : bullets)
   {
-    bullet.rec.x = player.rec.x;
-    bullet.rec.y = player.rec.y + player.rec.height / 4;
-    bullet.rec.width = 10;
-    bullet.rec.height = 5;
-    bullet.speed.x = 7;
-    bullet.speed.y = 0;
-    bullet.active = false;
-    bullet.color = raylib::Color::Yellow;
+    raylib::Rectangle bulletRec{player.rec.x, player.rec.y + player.rec.height / 4, 10, 5};
+    int bulletSpeed = 4;
+    bullet = Bullet{bulletRec, bulletSpeed, false, raylib::Color::Yellow};
   }
 }
 
@@ -207,7 +227,7 @@ void UpdateGame()
       // Player collision with enemies
       for (int i = 0; i < activeEnemies; ++i)
       {
-        if (CheckCollisionRecs(player.rec, enemies[i].rec))
+        if (player.rec.CheckCollision(enemies[i].rec))
         {
           isGameOver = true;
         }
@@ -218,7 +238,7 @@ void UpdateGame()
       {
         if (enemies[i].active)
         {
-          enemies[i].rec.x -= enemies[i].speed.x;
+          enemies[i].rec.x -= enemies[i].speed;
 
           if (enemies[i].rec.x < 0)
           {
@@ -228,35 +248,23 @@ void UpdateGame()
         }
       }
 
-      // Wall behaviour
-      if (player.rec.x <= 0)
-      {
-        player.rec.x = 0;
-      }
-      if (player.rec.x + player.rec.width >= SCREEN_WIDTH)
-      {
-        player.rec.x = SCREEN_WIDTH - player.rec.width;
-      }
-      if (player.rec.y <= 0)
-      {
-        player.rec.y = 0;
-      }
-      if (player.rec.y + player.rec.height >= SCREEN_HEIGHT)
-      {
-        player.rec.y = SCREEN_HEIGHT - player.rec.height;
-      }
+      // Wall limits
+      player.rec.x = std::max(player.rec.x, 0.0f);
+      player.rec.x = std::min(player.rec.x, SCREEN_WIDTH - player.rec.width);
+      player.rec.y = std::max(player.rec.y, 0.0f);
+      player.rec.y = std::min(player.rec.y, SCREEN_HEIGHT - player.rec.height);
 
-      // Bullet initialization
-      if (IsKeyDown(KEY_SPACE))
+      // Bullet spawning
+      if (::IsKeyDown(::KEY_SPACE))
       {
-        bulletRate += 5;
+        bulletRate += 3;
 
         for (int i = 0; i < NUM_BULLETS; ++i)
         {
           if (!bullets[i].active && bulletRate % 20 == 0)
           {
             bullets[i].rec.x = player.rec.x;
-            bullets[i].rec.y = player.rec.y + player.rec.height / 4;
+            bullets[i].rec.y = player.rec.y + player.rec.height / 2;
             bullets[i].active = true;
             break;
           }
@@ -264,21 +272,21 @@ void UpdateGame()
       }
 
       // Bullet logic
-      for (int i = 0; i < NUM_BULLETS; ++i)
+      for (auto &bullet : bullets)
       {
-        if (bullets[i].active)
+        if (bullet.active)
         {
           // Movement
-          bullets[i].rec.x += bullets[i].speed.x;
+          bullet.rec.x += bullet.speed;
 
           // Collision with enemies
           for (int j = 0; j < activeEnemies; ++j)
           {
             if (enemies[j].active)
             {
-              if (CheckCollisionRecs(bullets[i].rec, enemies[j].rec))
+              if (bullet.rec.CheckCollision(enemies[j].rec))
               {
-                bullets[i].active = false;
+                bullet.active = false;
                 enemies[j].rec.x = GetRandomValue(SCREEN_WIDTH, SCREEN_WIDTH + 1000);
                 enemies[j].rec.y = GetRandomValue(0, SCREEN_HEIGHT - enemies[j].rec.height);
                 bulletRate = 0;
@@ -286,9 +294,9 @@ void UpdateGame()
                 score += 100;
               }
 
-              if (bullets[i].rec.x + bullets[i].rec.width >= SCREEN_WIDTH)
+              if (bullet.rec.x + bullet.rec.width >= SCREEN_WIDTH)
               {
-                bullets[i].active = false;
+                bullet.active = false;
                 bulletRate = 0;
               }
             }
@@ -349,18 +357,21 @@ void DrawGame()
 
   if (!isGameOver)
   {
-    player.rec.Draw(player.color);
+    // Draw Player
+    // player.rec.Draw(player.color);
+    playerTexture.Draw(raylib::Vector2{player.rec.x+PLAYER_WIDTH*2, player.rec.y-5}, 90.0f, 0.35f, raylib::Color::White);
 
-    announceWave(wave);
-
+    // Draw enemies
     for (int i = 0; i < activeEnemies; ++i)
     {
       if (enemies[i].active)
       {
-        enemies[i].rec.Draw(enemies[i].color);
+        // enemies[i].rec.Draw(enemies[i].color);
+        enemyTexture.Draw(raylib::Vector2{enemies[i].rec.x, enemies[i].rec.y}, 0.0f, 0.16f, enemies[i].color);
       }
     }
 
+    // Draw bullets
     for (auto &bullet : bullets)
     {
       if (bullet.active)
@@ -391,6 +402,8 @@ void DrawGame()
     ::DrawText(promptRetry, SCREEN_WIDTH / 2 - MeasureText(promptRetry, 20) / 2, GetScreenHeight() / 2 - 50, 20,
                raylib::Color::Gray);
   }
+
+  announceWave(wave);
 
   ::EndDrawing();
 }
