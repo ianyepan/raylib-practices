@@ -16,8 +16,8 @@ struct Flappy
   int radius;
   raylib::Color color;
 
-  Flappy(raylib::Vector2 p_position, int p_radius, raylib::Color p_color)
-      : position{p_position}, radius{p_radius}, color{p_color}
+  Flappy(raylib::Vector2 _position, int _radius, raylib::Color _color)
+      : position{_position}, radius{_radius}, color{_color}
   {
   }
 };
@@ -176,8 +176,8 @@ void tuneAlpha()
 
 void announceGame()
 {
-  const char *msg = "Welcome To Flappy Bird!";
-  ::DrawText(msg, SCREEN_WIDTH / 2 - MeasureText(msg, 40) / 2, SCREEN_HEIGHT / 2 - 40, 40,
+  const char *welcomeMessage = "Welcome To Flappy Bird!";
+  ::DrawText(welcomeMessage, SCREEN_WIDTH / 2 - MeasureText(welcomeMessage, 40) / 2, SCREEN_HEIGHT / 2 - 40, 40,
              Fade(raylib::Color::White, alpha));
 }
 

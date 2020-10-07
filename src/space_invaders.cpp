@@ -22,8 +22,7 @@ struct Player
   raylib::Vector2 speed;
   raylib::Color color;
 
-  Player(raylib::Rectangle p_rec, raylib::Vector2 p_speed, raylib::Color p_color)
-      : rec{p_rec}, speed{p_speed}, color{p_color}
+  Player(raylib::Rectangle _rec, raylib::Vector2 _speed, raylib::Color _color) : rec{_rec}, speed{_speed}, color{_color}
   {
   }
 };
@@ -66,6 +65,7 @@ static bool isOpaque = false;
 
 static void InitGame();
 static void tuneAlpha();
+static void initNextWave();
 static void UpdateGame();
 static void announceWave(EnemyWave wave);
 static void DrawGame();
@@ -90,10 +90,10 @@ void InitGame()
   // Initialize enemies
   for (auto &enemy : enemies)
   {
-    enemy.rec.width = 10;
-    enemy.rec.height = 10;
     enemy.rec.x = GetRandomValue(SCREEN_WIDTH, SCREEN_WIDTH + 1000);
     enemy.rec.y = GetRandomValue(0, SCREEN_HEIGHT - enemy.rec.height);
+    enemy.rec.width = 10;
+    enemy.rec.height = 10;
     enemy.speed.x = 5;
     enemy.speed.y = 5;
     enemy.active = true;
@@ -130,6 +130,19 @@ void tuneAlpha()
   }
 }
 
+void initNextWave()
+{
+  enemyKills = 0;
+
+  for (int i = 0; i < activeEnemies; ++i)
+  {
+    enemies[i].active = true;
+  }
+
+  isOpaque = false; // so that text can fade in upon next wave
+  alpha = 0.0f;
+}
+
 // Update game (one frame)
 void UpdateGame()
 {
@@ -144,19 +157,12 @@ void UpdateGame()
       {
         tuneAlpha();
 
+        // Ready to move on to next wave
         if (enemyKills == activeEnemies)
         {
-          enemyKills = 0;
-
-          for (int i = 0; i < activeEnemies; ++i)
-          {
-            enemies[i].active = true;
-          }
-
-          activeEnemies = SECOND_WAVE_ENEMIES;
           wave = SECOND_WAVE;
-          isOpaque = false; // so that text can fade in upon next wave
-          alpha = 0.0f;
+          activeEnemies = SECOND_WAVE_ENEMIES;
+          initNextWave();
         }
       }
       else if (wave == SECOND_WAVE)
@@ -165,18 +171,9 @@ void UpdateGame()
 
         if (enemyKills == activeEnemies)
         {
-          enemyKills = 0;
-
-          for (int i = 0; i < activeEnemies; ++i)
-          {
-            if (!enemies[i].active)
-              enemies[i].active = true;
-          }
-
-          activeEnemies = THIRD_WAVE_ENEMIES;
           wave = THIRD_WAVE;
-          isOpaque = false; // so that text can fade in upon next wave
-          alpha = 0.0f;
+          activeEnemies = THIRD_WAVE_ENEMIES;
+          initNextWave();
         }
       }
       else if (wave == THIRD_WAVE)
@@ -312,21 +309,36 @@ void UpdateGame()
 
 void announceWave(EnemyWave wave)
 {
-  if (wave == FIRST_WAVE)
+  switch (wave)
   {
+  case (FIRST_WAVE):
     ::DrawText("FIRST WAVE", SCREEN_WIDTH / 2 - MeasureText("FIRST WAVE", 40) / 2, SCREEN_HEIGHT / 2 - 40, 40,
                Fade(raylib::Color::White, alpha));
-  }
-  else if (wave == SECOND_WAVE)
-  {
+    break;
+  case (SECOND_WAVE):
     ::DrawText("SECOND WAVE", SCREEN_WIDTH / 2 - MeasureText("SECOND WAVE", 40) / 2, SCREEN_HEIGHT / 2 - 40, 40,
                Fade(raylib::Color::White, alpha));
-  }
-  else if (wave == THIRD_WAVE)
-  {
+    break;
+  case (THIRD_WAVE):
     ::DrawText("THIRD WAVE", SCREEN_WIDTH / 2 - MeasureText("THIRD WAVE", 40) / 2, SCREEN_HEIGHT / 2 - 40, 40,
                Fade(raylib::Color::White, alpha));
+    break;
   }
+  // if (wave == FIRST_WAVE)
+  // {
+  //   ::DrawText("FIRST WAVE", SCREEN_WIDTH / 2 - MeasureText("FIRST WAVE", 40) / 2, SCREEN_HEIGHT / 2 - 40, 40,
+  //              Fade(raylib::Color::White, alpha));
+  // }
+  // else if (wave == SECOND_WAVE)
+  // {
+  //   ::DrawText("SECOND WAVE", SCREEN_WIDTH / 2 - MeasureText("SECOND WAVE", 40) / 2, SCREEN_HEIGHT / 2 - 40, 40,
+  //              Fade(raylib::Color::White, alpha));
+  // }
+  // else if (wave == THIRD_WAVE)
+  // {
+  //   ::DrawText("THIRD WAVE", SCREEN_WIDTH / 2 - MeasureText("THIRD WAVE", 40) / 2, SCREEN_HEIGHT / 2 - 40, 40,
+  //              Fade(raylib::Color::White, alpha));
+  // }
 }
 
 // Draw each frame
@@ -361,19 +373,23 @@ void DrawGame()
 
     if (victory)
     {
-      ::DrawText("YOU WIN", SCREEN_WIDTH / 2 - MeasureText("YOU WIN", 40) / 2, SCREEN_HEIGHT / 2 - 40, 40, WHITE);
+      const char *winMessage = "YOU'VE WON!";
+      ::DrawText(winMessage, SCREEN_WIDTH / 2 - MeasureText(winMessage, 40) / 2, SCREEN_HEIGHT / 2 - 40, 40,
+                 raylib::Color::White);
     }
 
     if (isPaused)
     {
-      ::DrawText("GAME PAUSED", SCREEN_WIDTH / 2 - MeasureText("GAME PAUSED", 40) / 2, SCREEN_HEIGHT / 2 - 40, 40,
-                 GRAY);
+      const char *pauseMessage = "GAME PAUSED";
+      ::DrawText(pauseMessage, SCREEN_WIDTH / 2 - MeasureText(pauseMessage, 40) / 2, SCREEN_HEIGHT / 2 - 40, 40,
+                 raylib::Color::Gray);
     }
   }
   else
   {
-    ::DrawText("PRESS [ENTER] TO PLAY AGAIN", GetScreenWidth() / 2 - MeasureText("PRESS [ENTER] TO PLAY AGAIN", 20) / 2,
-               GetScreenHeight() / 2 - 50, 20, GRAY);
+    const char *promptRetry = "PRESS [ENTER] TO PLAY AGAIN";
+    ::DrawText(promptRetry, SCREEN_WIDTH / 2 - MeasureText(promptRetry, 20) / 2, GetScreenHeight() / 2 - 50, 20,
+               raylib::Color::Gray);
   }
 
   ::EndDrawing();
