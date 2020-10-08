@@ -17,9 +17,9 @@ const int BALL_SPEED = 5;
 const raylib::Color BG_COLOR{3, 1, 146};
 const std::array<raylib::Color, 5> COLOR_VECTOR{raylib::Color::Green, raylib::Color::Blue, raylib::Color::Red,
                                                 raylib::Color::Pink, raylib::Color::Gold};
-const std::array<raylib::Color> TINT_VECTOR{raylib::Color{150, 255, 150}, raylib::Color{150, 150, 255},
-                                            raylib::Color{255, 150, 150}, raylib::Color{255, 100, 255},
-                                            raylib::Color{255, 255, 100}};
+const std::array<raylib::Color, 5> TINT_VECTOR{raylib::Color{150, 255, 150}, raylib::Color{150, 150, 255},
+                                               raylib::Color{255, 150, 150}, raylib::Color{255, 100, 255},
+                                               raylib::Color{255, 255, 100}};
 const int NUM_OF_COLORS = (int)COLOR_VECTOR.size();
 
 auto checkedImage = raylib::Image::GenChecked(SCREEN_WIDTH, SCREEN_HEIGHT, 10, 10, BG_COLOR, BG_COLOR.Fade(0.9f));
