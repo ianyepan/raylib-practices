@@ -4,6 +4,8 @@
 #include <algorithm>
 #include <array>
 
+namespace
+{
 const int SCREEN_WIDTH = 1200;
 const int SCREEN_HEIGHT = 700;
 
@@ -16,9 +18,8 @@ const int PLAYER_HEIGHT = 50;
 const int PLAYER_WIDTH = 20;
 const int ENEMY_HEIGHT = 35;
 const int ENEMY_WIDTH = 45;
-const std::array<raylib::Color, 3> ENEMY_COLOR_POOL{
-  raylib::Color{238,237,49}, raylib::Color{243,49,242}, raylib::Color{38,233,235}
-};
+const std::array<raylib::Color, 3> ENEMY_COLOR_POOL{raylib::Color{238, 237, 49}, raylib::Color{243, 49, 242},
+                                                    raylib::Color{38, 233, 235}};
 
 enum EnemyWave
 {
@@ -66,48 +67,35 @@ struct Bullet
   }
 };
 
-static bool isGameOver = false;
-static bool isPaused = false;
-static int score = 0;
-static bool victory = false;
+bool isGameOver = false;
+bool isPaused = false;
+int score = 0;
+bool victory = false;
 
-static Player player{raylib::Rectangle{20, 50, PLAYER_WIDTH, PLAYER_HEIGHT}, raylib::Vector2{3, 3}, raylib::Color::White};
-static std::array<Enemy, NUM_MAX_ENEMIES> enemies;
-static std::array<Bullet, NUM_BULLETS> bullets;
-static EnemyWave wave = FIRST_WAVE;
+Player player{raylib::Rectangle{20, 50, PLAYER_WIDTH, PLAYER_HEIGHT}, raylib::Vector2{3, 3},
+                     raylib::Color::White};
+std::array<Enemy, NUM_MAX_ENEMIES> enemies;
+std::array<Bullet, NUM_BULLETS> bullets;
+EnemyWave wave = FIRST_WAVE;
 
-static int bulletRate = 0;
-static float alpha = 0.0f;
+int bulletRate = 0;
+float alpha = 0.0f;
 
-static int activeEnemies = FIRST_WAVE_ENEMIES;
-static int enemyKills = 0;
-static bool isOpaque = false;
+int activeEnemies = FIRST_WAVE_ENEMIES;
+int enemyKills = 0;
+bool isOpaque = false;
 
 raylib::Texture2D playerTexture;
 raylib::Texture2D enemyTexture;
 raylib::Texture2D enemyTexture2;
 
-static void InitGame();
-static void tuneAlpha();
-static void initNextWave();
-static void UpdateGame();
-static void announceWave(EnemyWave wave);
-static void DrawGame();
-static void UpdateDrawFrame();
-
-int main()
-{
-  raylib::Window window{SCREEN_WIDTH, SCREEN_HEIGHT, "Sample game: Space Invaders"};
-  InitGame();
-  SetTargetFPS(120);
-
-  while (!window.ShouldClose())
-  {
-    UpdateDrawFrame();
-  }
-
-  return 0;
-}
+void InitGame();
+void tuneAlpha();
+void initNextWave();
+void UpdateGame();
+void announceWave(EnemyWave wave);
+void DrawGame();
+void UpdateDrawFrame();
 
 void InitGame()
 {
@@ -240,7 +228,7 @@ void UpdateGame()
         {
           enemies[i].rec.x -= enemies[i].speed;
 
-          if (enemies[i].rec.x < 0)
+          if (enemies[i].rec.x + ENEMY_WIDTH < 0)
           {
             enemies[i].rec.x = GetRandomValue(SCREEN_WIDTH, SCREEN_WIDTH + 1000);
             enemies[i].rec.y = GetRandomValue(0, SCREEN_HEIGHT - enemies[i].rec.height);
@@ -359,14 +347,14 @@ void DrawGame()
   {
     // Draw Player
     // player.rec.Draw(player.color);
-    playerTexture.Draw(raylib::Vector2{player.rec.x+PLAYER_WIDTH*2, player.rec.y-5}, 90.0f, 0.35f, raylib::Color::White);
+    playerTexture.Draw(raylib::Vector2{player.rec.x + PLAYER_WIDTH * 2, player.rec.y - 5}, 90.0f, 0.35f,
+                       raylib::Color::White);
 
     // Draw enemies
     for (int i = 0; i < activeEnemies; ++i)
     {
       if (enemies[i].active)
       {
-        enemies[i].rec.Draw(raylib::Color::White);
         enemyTexture.Draw(raylib::Vector2{enemies[i].rec.x, enemies[i].rec.y}, 0.0f, 0.16f, enemies[i].color);
       }
     }
@@ -413,4 +401,20 @@ void UpdateDrawFrame()
 {
   UpdateGame();
   DrawGame();
+}
+
+} // namespace
+
+int main()
+{
+  raylib::Window window{SCREEN_WIDTH, SCREEN_HEIGHT, "Sample game: Space Invaders"};
+  InitGame();
+  SetTargetFPS(120);
+
+  while (!window.ShouldClose())
+  {
+    UpdateDrawFrame();
+  }
+
+  return 0;
 }
