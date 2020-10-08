@@ -121,7 +121,7 @@ void InitGame()
     raylib::Rectangle enemyRec{(float)GetRandomValue(SCREEN_WIDTH, SCREEN_WIDTH + 1000),
                                (float)GetRandomValue(0, SCREEN_HEIGHT - ENEMY_HEIGHT), ENEMY_WIDTH, ENEMY_HEIGHT};
     int enemySpeed = 2;
-    auto enemyColor = ENEMY_COLOR_POOL[::GetRandomValue(0, (int)ENEMY_COLOR_POOL.size())];
+    auto enemyColor = ENEMY_COLOR_POOL[::GetRandomValue(0, (int)ENEMY_COLOR_POOL.size() - 1)];
     enemy = Enemy{enemyRec, enemySpeed, true, enemyColor};
   }
 
@@ -366,7 +366,7 @@ void DrawGame()
     {
       if (enemies[i].active)
       {
-        // enemies[i].rec.Draw(enemies[i].color);
+        enemies[i].rec.Draw(raylib::Color::White);
         enemyTexture.Draw(raylib::Vector2{enemies[i].rec.x, enemies[i].rec.y}, 0.0f, 0.16f, enemies[i].color);
       }
     }
