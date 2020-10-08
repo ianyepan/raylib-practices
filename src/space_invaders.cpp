@@ -4,8 +4,8 @@
 #include <algorithm>
 #include <array>
 
-static const int SCREEN_WIDTH = 1200;
-static const int SCREEN_HEIGHT = 700;
+const int SCREEN_WIDTH = 1200;
+const int SCREEN_HEIGHT = 700;
 
 const int NUM_BULLETS = 50;
 const int NUM_MAX_ENEMIES = 70;

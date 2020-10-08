@@ -4,7 +4,7 @@
 #include <iostream>
 #include <ostream>
 
-// Compile command:  g++ primitive.cpp -lraylib -lGL -lm -lpthread -ldl -lrt -lX11 -std=c++17
+// Compile command:  g++ shapes.cpp -lraylib -lGL -lm -lpthread -ldl -lrt -lX11 -std=c++17
 
 const int WIDTH = 900;
 const int HEIGHT = 600;

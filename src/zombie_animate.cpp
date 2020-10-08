@@ -3,8 +3,11 @@
 
 #include <array>
 
+namespace
+{
 const int SCREEN_WIDTH = 400;
 const int SCREEN_HEIGHT = 400;
+} // namespace
 
 int main()
 {
@@ -43,7 +46,7 @@ int main()
     // }
 
     zombie.Draw(raylib::Rectangle{frameRightBounds[frameIndex], frameTopBound,
-                                  frameRightBounds[frameIndex+1] - frameRightBounds[frameIndex], frameLowBound},
+                                  frameRightBounds[frameIndex + 1] - frameRightBounds[frameIndex], frameLowBound},
                 raylib::Vector2{10, 10}, raylib::Color::RayWhite);
 
     ::EndDrawing();

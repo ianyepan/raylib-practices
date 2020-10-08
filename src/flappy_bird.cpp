@@ -4,11 +4,17 @@
 #include <algorithm>
 #include <array>
 
+namespace
+{
+const int SCREEN_WIDTH = 800;
+const int SCREEN_HEIGHT = 450;
+
 const int MAX_TUBES = 100;
 const int FLAPPY_RADIUS = 18;
 const int TUBES_WIDTH = 50;
 const int GRAVITY = 1;
 const float JUMP_HEIGHT = 1.5f;
+const int TUBE_SPEED = 1;
 
 struct Flappy
 {
@@ -29,47 +35,28 @@ struct Tubes
   bool active;
 };
 
-static const int SCREEN_WIDTH = 800;
-static const int SCREEN_HEIGHT = 450;
-static const int TUBE_SPEED = 1;
+bool isGameOver = false;
+bool isPaused = false;
+int score = 0;
+int hiScore = 0;
 
-static bool isGameOver = false;
-static bool isPaused = false;
-static int score = 0;
-static int hiScore = 0;
+float alpha = 0.0f;
+bool isOpaque = false;
 
-static float alpha = 0.0f;
-static bool isOpaque = false;
+Flappy flappy{raylib::Vector2{80, (float)(SCREEN_HEIGHT / 2 - FLAPPY_RADIUS)}, FLAPPY_RADIUS, raylib::Color::DarkGray};
+std::array<Tubes, MAX_TUBES * 2> tubes;
+std::array<raylib::Vector2, MAX_TUBES> tubesPos;
 
-static Flappy flappy{raylib::Vector2{80, (float)(SCREEN_HEIGHT / 2 - FLAPPY_RADIUS)}, FLAPPY_RADIUS,
-                     raylib::Color::DarkGray};
-static std::array<Tubes, MAX_TUBES * 2> tubes;
-static std::array<raylib::Vector2, MAX_TUBES> tubesPos;
+raylib::Texture2D backgroundTexture;
+raylib::Texture2D flappyTexture;
+raylib::Texture2D tubeTexture;
 
-static raylib::Texture2D backgroundTexture;
-static raylib::Texture2D flappyTexture;
-static raylib::Texture2D tubeTexture;
-
-static void InitGame();
-static void UpdateGame();
-static void tuneAlpha();
-static void announceGame();
-static void DrawGame();
-static void UpdateDrawFrame();
-
-int main()
-{
-  raylib::Window window{SCREEN_WIDTH, SCREEN_HEIGHT, "Sample game: Flappy Bird"};
-  InitGame();
-  ::SetTargetFPS(120);
-
-  while (!window.ShouldClose())
-  {
-    UpdateDrawFrame();
-  }
-
-  return 0;
-}
+void InitGame();
+void UpdateGame();
+void tuneAlpha();
+void announceGame();
+void DrawGame();
+void UpdateDrawFrame();
 
 void InitGame()
 {
@@ -243,4 +230,20 @@ void UpdateDrawFrame()
 {
   UpdateGame();
   DrawGame();
+}
+
+} // namespace
+
+int main()
+{
+  raylib::Window window{SCREEN_WIDTH, SCREEN_HEIGHT, "Sample game: Flappy Bird"};
+  InitGame();
+  ::SetTargetFPS(120);
+
+  while (!window.ShouldClose())
+  {
+    UpdateDrawFrame();
+  }
+
+  return 0;
 }
