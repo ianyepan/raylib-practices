@@ -78,11 +78,12 @@ std::array<Bullet, NUM_BULLETS> bullets;
 EnemyWave wave = FIRST_WAVE;
 
 int bulletRate = 0;
-float alpha = 0.0f;
-
 int activeEnemies = FIRST_WAVE_ENEMIES;
 int enemyKills = 0;
+
+float alpha = 0.0f;
 bool isOpaque = false;
+float duration = 0.0f;
 
 raylib::Texture2D playerTexture;
 raylib::Texture2D enemyTexture;
@@ -133,9 +134,13 @@ void tuneAlpha()
       isOpaque = true;
     }
   }
-  else
+  else // TODO: somewhere need to reset duration back to 0.0f
   {
-    alpha -= 0.02f;
+    duration += 0.02f;
+    if (duration >= 1.0f)
+    {
+      alpha -= 0.02f;
+    }
   }
 }
 
