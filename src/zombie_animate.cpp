@@ -28,7 +28,7 @@ int main()
   while (!window.ShouldClose())
   {
     ::BeginDrawing();
-    ::ClearBackground(raylib::Color::RayWhite);
+    ::ClearBackground(::RAYWHITE);
 
     timer += ::GetFrameTime();
     if (timer >= 0.1f)
@@ -47,7 +47,7 @@ int main()
 
     zombie.Draw(raylib::Rectangle{frameRightBounds[frameIndex], frameTopBound,
                                   frameRightBounds[frameIndex + 1] - frameRightBounds[frameIndex], frameLowBound},
-                raylib::Vector2{10, 10}, raylib::Color::RayWhite);
+                raylib::Vector2{10, 10}, ::RAYWHITE);
 
     ::EndDrawing();
   }
