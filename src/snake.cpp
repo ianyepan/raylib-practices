@@ -32,9 +32,7 @@ bool isGameOver;
 bool isPaused;
 
 Food fruit = {0};
-// Snake snake[SNAKE_LENGTH] = {0};
 std::array<Snake, SNAKE_LENGTH> snake;
-// raylib::Vector2 snakePosition[SNAKE_LENGTH] = {0};
 std::array<raylib::Vector2, SNAKE_LENGTH> snakePosition;
 bool allowMove;
 raylib::Vector2 offset;
@@ -209,13 +207,17 @@ void DrawGame()
 
     // Draw snake
     for (int i = 0; i < counterTail; ++i)
+    {
       DrawRectangleV(snake[i].position, snake[i].size, snake[i].color);
+    }
 
     // Draw fruit to pick
     DrawRectangleV(fruit.position, fruit.size, fruit.color);
 
     if (isPaused)
+    {
       DrawText("GAME PAUSED", SCREEN_WIDTH / 2 - MeasureText("GAME PAUSED", 40) / 2, SCREEN_HEIGHT / 2 - 40, 40, GRAY);
+    }
   }
   else
     DrawText("PRESS [ENTER] TO PLAY AGAIN", GetScreenWidth() / 2 - MeasureText("PRESS [ENTER] TO PLAY AGAIN", 20) / 2,
