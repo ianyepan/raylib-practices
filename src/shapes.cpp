@@ -63,7 +63,7 @@ int main()
   {
     ::BeginDrawing();
 
-    raylib::Color::RayWhite.ClearBackground();
+    ::ClearBackground(::RAYWHITE);
 
     // use static so that updates at each loop is "remembered"
     static int xPosition = 200;
@@ -75,11 +75,11 @@ int main()
     }
 
     xPosition += step;
-    ::DrawText("Rip And Tear", xPosition, 20, 30, raylib::Color::Maroon);
+    ::DrawText("Rip And Tear", xPosition, 20, 30, ::MAROON);
 
-    DrawPulsingSquare(100, 200, raylib::Color::Blue);
+    DrawPulsingSquare(100, 200, ::BLUE);
 
-    DrawRotateRectangle(500, 200, raylib::Color::Maroon);
+    DrawRotateRectangle(500, 200, ::MAROON);
 
     ::EndDrawing();
   }
