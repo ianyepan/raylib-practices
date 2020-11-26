@@ -286,7 +286,7 @@ void DrawGame()
 
   ::ClearBackground(::RAYWHITE);
 
-  backgroundTexture.Draw(raylib::Vector2{0, 0}, 0.0f, 5.0f, WHITE);
+  backgroundTexture.Draw(raylib::Vector2{0, 0}, 0.0f, 5.0f, ::WHITE);
 
   if (!gameOver)
   {
