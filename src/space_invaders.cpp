@@ -72,7 +72,7 @@ bool isPaused = false;
 int score = 0;
 bool victory = false;
 
-Player player{raylib::Rectangle{20, 50, PLAYER_WIDTH, PLAYER_HEIGHT}, raylib::Vector2{3, 3}, raylib::Color::White};
+Player player{raylib::Rectangle{20, 50, PLAYER_WIDTH, PLAYER_HEIGHT}, raylib::Vector2{3, 3}, ::WHITE};
 std::array<Enemy, NUM_MAX_ENEMIES> enemies;
 std::array<Bullet, NUM_BULLETS> bullets;
 EnemyWave wave = FIRST_WAVE;
@@ -120,7 +120,7 @@ void InitGame()
   {
     raylib::Rectangle bulletRec{player.rec.x, player.rec.y + player.rec.height / 4, 10, 5};
     int bulletSpeed = 4;
-    bullet = Bullet{bulletRec, bulletSpeed, false, raylib::Color::Yellow};
+    bullet = Bullet{bulletRec, bulletSpeed, false, ::YELLOW};
   }
 }
 
@@ -317,15 +317,15 @@ void announceWave(EnemyWave wave)
   {
   case (FIRST_WAVE):
     ::DrawText("FIRST WAVE", SCREEN_WIDTH / 2 - MeasureText("FIRST WAVE", 40) / 2, SCREEN_HEIGHT / 2 - 40, 40,
-               Fade(raylib::Color::White, alpha));
+               Fade(::WHITE, alpha));
     break;
   case (SECOND_WAVE):
     ::DrawText("SECOND WAVE", SCREEN_WIDTH / 2 - MeasureText("SECOND WAVE", 40) / 2, SCREEN_HEIGHT / 2 - 40, 40,
-               Fade(raylib::Color::White, alpha));
+               Fade(::WHITE, alpha));
     break;
   case (THIRD_WAVE):
     ::DrawText("THIRD WAVE", SCREEN_WIDTH / 2 - MeasureText("THIRD WAVE", 40) / 2, SCREEN_HEIGHT / 2 - 40, 40,
-               Fade(raylib::Color::White, alpha));
+               Fade(::WHITE, alpha));
     break;
   }
 }
@@ -334,16 +334,16 @@ void announceWave(EnemyWave wave)
 void DrawGame()
 {
   ::BeginDrawing();
-  ::ClearBackground(raylib::Color::RayWhite);
+  ::ClearBackground(::RAYWHITE);
 
   if (!isGameOver)
   {
-    backgroundTexture.Draw(raylib::Vector2{0, 0}, 0.0f, 0.7f, raylib::Color::Gray);
+    backgroundTexture.Draw(raylib::Vector2{0, 0}, 0.0f, 0.7f, ::GRAY);
 
     // Draw Player
     // player.rec.Draw(player.color);
     playerTexture.Draw(raylib::Vector2{player.rec.x + PLAYER_WIDTH * 2, player.rec.y - 5}, 90.0f, 0.35f,
-                       raylib::Color::White);
+                       ::WHITE);
 
     // Draw enemies
     for (int i = 0; i < activeEnemies; ++i)
@@ -363,28 +363,28 @@ void DrawGame()
       }
     }
 
-    ::DrawText(::TextFormat("%04i", score), 20, 20, 40, raylib::Color::RayWhite);
+    ::DrawText(::TextFormat("%04i", score), 20, 20, 40, ::RAYWHITE);
 
     if (victory)
     {
       const char *winMessage = "YOU'VE WON!";
       ::DrawText(winMessage, SCREEN_WIDTH / 2 - MeasureText(winMessage, 40) / 2, SCREEN_HEIGHT / 2 - 40, 40,
-                 raylib::Color::White);
+                 ::WHITE);
     }
 
     if (isPaused)
     {
       const char *pauseMessage = "GAME PAUSED";
       ::DrawText(pauseMessage, SCREEN_WIDTH / 2 - MeasureText(pauseMessage, 40) / 2, SCREEN_HEIGHT / 2 - 40, 40,
-                 raylib::Color::RayWhite);
+                 ::RAYWHITE);
     }
   }
   else
   {
-    backgroundTexture.Draw(raylib::Vector2{0, 0}, 0.0f, 0.7f, raylib::Color::DarkGray);
+    backgroundTexture.Draw(raylib::Vector2{0, 0}, 0.0f, 0.7f, ::DARKGRAY);
     const char *promptRetry = "PRESS [ENTER] TO PLAY AGAIN";
     ::DrawText(promptRetry, SCREEN_WIDTH / 2 - MeasureText(promptRetry, 30) / 2, GetScreenHeight() / 2 - 50, 30,
-               raylib::Color::RayWhite);
+               ::RAYWHITE);
   }
 
   announceWave(wave);

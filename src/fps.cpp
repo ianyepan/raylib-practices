@@ -29,13 +29,13 @@ void drawHUD()
 {
   raylib::Vector2 hudPosition{10, 10};
   raylib::Vector2 hudSize{440, 140};
-  hudPosition.DrawRectangle(hudSize, raylib::Color::SkyBlue.Fade(0.5f));
-  ::DrawRectangleLines(hudPosition.GetX(), hudPosition.GetY(), hudSize.GetX(), hudSize.GetY(), raylib::Color::Blue);
+  hudPosition.DrawRectangle(hudSize, raylib::Color(::SkyBlue).Fade(0.5f));
+  ::DrawRectangleLines(hudPosition.GetX(), hudPosition.GetY(), hudSize.GetX(), hudSize.GetY(), ::BLUE);
 
   int fontSize = 20;
-  ::DrawText("First person camera default controls:", 20, hudSize.GetY() * 1 / 6, fontSize, raylib::Color::White);
-  ::DrawText("- Move with keys: W, A, S, D", 40, hudSize.GetY() * 3 / 6, fontSize, raylib::Color::White);
-  ::DrawText("- Mouse move to look around", 40, hudSize.GetY() * 5 / 6, fontSize, raylib::Color::White);
+  ::DrawText("First person camera default controls:", 20, hudSize.GetY() * 1 / 6, fontSize, ::WHITE);
+  ::DrawText("- Move with keys: W, A, S, D", 40, hudSize.GetY() * 3 / 6, fontSize, ::WHITE);
+  ::DrawText("- Mouse move to look around", 40, hudSize.GetY() * 5 / 6, fontSize, ::WHITE);
 }
 
 int main()
@@ -79,7 +79,7 @@ int main()
     {
       raylib::Vector3 sizeDimensions{2.0f, heights[i], 2.0f};
       positions[i].DrawCube(sizeDimensions, colors[i]);
-      positions[i].DrawCubeWires(sizeDimensions, raylib::Color::LightGray);
+      positions[i].DrawCubeWires(sizeDimensions, ::LIGHTGRAY);
     }
 
     camera.EndMode3D();

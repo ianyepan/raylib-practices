@@ -284,34 +284,34 @@ void DrawGame()
 {
   ::BeginDrawing();
 
-  ::ClearBackground(raylib::Color::RayWhite);
+  ::ClearBackground(::RAYWHITE);
 
-  backgroundTexture.Draw(raylib::Vector2{0, 0}, 0.0f, 5.0f, raylib::Color::White);
+  backgroundTexture.Draw(raylib::Vector2{0, 0}, 0.0f, 5.0f, WHITE);
 
   if (!gameOver)
   {
     // Draw lives (health)
     raylib::Vector2 hudPosition{20, SCREEN_HEIGHT - 70};
     raylib::Vector2 hudSize{150, 40};
-    hudPosition.DrawRectangle(hudSize, raylib::Color::Green.Fade(0.5f));
+    hudPosition.DrawRectangle(hudSize, raylib::Color(::GREEN).Fade(0.5f));
     ::DrawRectangleLines(hudPosition.GetX(), hudPosition.GetY(), hudSize.GetX(), hudSize.GetY(),
-                         raylib::Color::RayWhite);
-    ::DrawText("Lives Left:", hudPosition.GetX() + 10, hudPosition.GetY() + 10, 20, raylib::Color::Green);
+                         ::RAYWHITE);
+    ::DrawText("Lives Left:", hudPosition.GetX() + 10, hudPosition.GetY() + 10, 20, ::GREEN);
 
     for (int i = 0; i < player.life; ++i)
     {
-      DrawRectangleGradientV(20 + 40 * i, SCREEN_HEIGHT - 20, 35, 10, raylib::Color::Green, raylib::Color::Lime);
+      DrawRectangleGradientV(20 + 40 * i, SCREEN_HEIGHT - 20, 35, 10, ::GREEN, ::LIME);
     }
 
     // Draw player bar
     playerTexture.Draw(raylib::Rectangle{0, 0, 228, 25},
                        raylib::Vector2{player.position.GetX() - player.size.GetX() / 2,
                                        player.position.GetY() - player.size.GetY() / 2},
-                       raylib::Color::RayWhite);
+                       ::RAYWHITE);
 
     // Draw ball
-    ::DrawCircleGradient(ball.position.GetX(), ball.position.GetY(), ball.radius, raylib::Color::White,
-                         raylib::Color::RayWhite);
+    ::DrawCircleGradient(ball.position.GetX(), ball.position.GetY(), ball.radius, ::WHITE,
+                         ::RAYWHITE);
 
     // Draw bricks
     int k = 0;
@@ -324,7 +324,7 @@ void DrawGame()
           bricksTexture.Draw(brickTextures[k],
                              raylib::Vector2{brick[i][j].position.GetX() - brickSize.GetX() / 2,
                                              brick[i][j].position.GetY() - brickSize.GetY() / 2},
-                             raylib::Color::RayWhite);
+                             ::RAYWHITE);
         }
         ++k;
       }
@@ -333,14 +333,14 @@ void DrawGame()
     if (pause)
     {
       ::DrawText("GAME PAUSED", SCREEN_WIDTH / 2 - MeasureText("GAME PAUSED", 40) / 2, SCREEN_HEIGHT / 2 - 40, 40,
-                 raylib::Color::LightGray);
+                 ::LIGHTGRAY);
     }
   }
   else // Game over
   {
     ::DrawText("PRESS [ENTER] TO PLAY AGAIN",
                ::GetScreenWidth() / 2 - ::MeasureText("PRESS [ENTER] TO PLAY AGAIN", 20) / 2,
-               ::GetScreenHeight() / 2 - 50, 20, raylib::Color::LightGray);
+               ::GetScreenHeight() / 2 - 50, 20, ::LIGHTGRAY);
   }
 
   ::EndDrawing();

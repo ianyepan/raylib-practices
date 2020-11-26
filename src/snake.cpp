@@ -63,7 +63,7 @@ void InitGame()
     snake[i].size = raylib::Vector2{SQUARE_SIZE, SQUARE_SIZE};
     snake[i].speed = raylib::Vector2{SQUARE_SIZE, 0};
 
-    snake[i].color = (i == 0) ? raylib::Color::DarkBlue : raylib::Color::Blue;
+    snake[i].color = (i == 0) ? ::DARKBLUE : ::BLUE;
   }
 
   for (int i = 0; i < SNAKE_LENGTH; ++i)
@@ -219,7 +219,7 @@ void DrawGame()
   }
   else
     DrawText("PRESS [ENTER] TO PLAY AGAIN", GetScreenWidth() / 2 - MeasureText("PRESS [ENTER] TO PLAY AGAIN", 20) / 2,
-             GetScreenHeight() / 2 - 50, 20, raylib::Color::DarkGray);
+             GetScreenHeight() / 2 - 50, 20, ::DARKGRAY);
 
   EndDrawing();
 }

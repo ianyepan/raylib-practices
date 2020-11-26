@@ -43,7 +43,7 @@ int hiScore = 0;
 float alpha = 0.0f;
 bool isOpaque = false;
 
-Flappy flappy{raylib::Vector2{80, (float)(SCREEN_HEIGHT / 2 - FLAPPY_RADIUS)}, FLAPPY_RADIUS, raylib::Color::DarkGray};
+Flappy flappy{raylib::Vector2{80, (float)(SCREEN_HEIGHT / 2 - FLAPPY_RADIUS)}, FLAPPY_RADIUS, ::DARKGRAY};
 std::array<Tubes, MAX_TUBES * 2> tubes;
 std::array<raylib::Vector2, MAX_TUBES> tubesPos;
 
@@ -165,60 +165,60 @@ void announceGame()
 {
   const char *welcomeMessage = "Welcome To Flappy Bird!";
   ::DrawText(welcomeMessage, SCREEN_WIDTH / 2 - MeasureText(welcomeMessage, 40) / 2, SCREEN_HEIGHT / 2 - 40, 40,
-             Fade(raylib::Color::White, alpha));
+             Fade(::WHITE, alpha));
 }
 
 // Draw game for one frame
 void DrawGame()
 {
   ::BeginDrawing();
-  ::ClearBackground(raylib::Color::RayWhite);
+  ::ClearBackground(::RAYWHITE);
 
   if (!isGameOver)
   {
-    backgroundTexture.Draw(raylib::Vector2{0, 0}, 0.0f, 0.5f, raylib::Color::White);
+    backgroundTexture.Draw(raylib::Vector2{0, 0}, 0.0f, 0.5f, ::WHITE);
 
     // flappy.position.DrawCircle(flappy.radius, flappy.color);
     raylib::Vector2 adjustedFlappyPosition{flappy.position.GetX() - flappy.radius - 2,
                                            flappy.position.GetY() - flappy.radius - 6};
 
-    flappyTexture.Draw(adjustedFlappyPosition, 0.0f, 0.4f, raylib::Color::White);
+    flappyTexture.Draw(adjustedFlappyPosition, 0.0f, 0.4f, ::WHITE);
 
     // Draw tubes
     for (int i = 0; i < MAX_TUBES; ++i)
     {
       // ::DrawRectangle(tubes[i * 2].rec.x, tubes[i * 2].rec.y, tubes[i * 2].rec.width, tubes[i * 2].rec.height,
-      //                          raylib::Color::Maroon);
+      //                          ::MAROON);
       // ::DrawRectangle(tubes[i * 2 + 1].rec.x, tubes[i * 2 + 1].rec.y, tubes[i * 2 + 1].rec.width,
-      //                          tubes[i * 2 + 1].rec.height, raylib::Color::Maroon);
+      //                          tubes[i * 2 + 1].rec.height, ::MAROON);
       // ::DrawRectangleLinesEx(
       //     raylib::Rectangle{tubes[i * 2].rec.x, tubes[i * 2].rec.y, tubes[i * 2].rec.width, tubes[i * 2].rec.height},
-      //     2, raylib::Color::Black);
+      //     2, ::BLACK);
       // ::DrawRectangleLinesEx(raylib::Rectangle{tubes[i * 2 + 1].rec.x, tubes[i * 2 + 1].rec.y,
       //                                          tubes[i * 2 + 1].rec.width, tubes[i * 2 + 1].rec.height},
-      //                        2, raylib::Color::Black);
+      //                        2, ::BLACK);
 
       tubeTexture.Draw(raylib::Vector2{tubes[i * 2].rec.x + TUBES_WIDTH, tubes[i * 2].rec.y + tubes[i * 2].rec.height},
-                       180.0f, 0.7f, raylib::Color::Pink);
+                       180.0f, 0.7f, ::PINK);
       tubeTexture.Draw(raylib::Vector2{tubes[i * 2 + 1].rec.x, tubes[i * 2 + 1].rec.y}, 0.0f, 0.7f,
-                       raylib::Color::Pink);
+                       ::PINK);
     }
 
-    ::DrawText(TextFormat("%04i", score), 20, 20, 40, raylib::Color::White);
-    ::DrawText(TextFormat("HI-SCORE: %04i", hiScore), 20, 70, 20, raylib::Color::White);
+    ::DrawText(TextFormat("%04i", score), 20, 20, 40, ::WHITE);
+    ::DrawText(TextFormat("HI-SCORE: %04i", hiScore), 20, 70, 20, ::WHITE);
 
     if (isPaused)
     {
       ::DrawText("GAME PAUSED", SCREEN_WIDTH / 2 - MeasureText("GAME PAUSED", 40) / 2, SCREEN_HEIGHT / 2 - 40, 40,
-                 raylib::Color::White);
+                 ::WHITE);
     }
   }
   else
   {
-    backgroundTexture.Draw(raylib::Vector2{0, 0}, 0.0f, 0.5f, raylib::Color::Gray);
+    backgroundTexture.Draw(raylib::Vector2{0, 0}, 0.0f, 0.5f, ::GRAY);
 
     ::DrawText("PRESS [ENTER] TO PLAY AGAIN", GetScreenWidth() / 2 - MeasureText("PRESS [ENTER] TO PLAY AGAIN", 25) / 2,
-               GetScreenHeight() / 2 - 50, 25, raylib::Color::White);
+               GetScreenHeight() / 2 - 50, 25, ::WHITE);
   }
 
   announceGame();
