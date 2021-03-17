@@ -3,6 +3,9 @@
 
 #include <algorithm>
 #include <array>
+#include <iostream>
+
+int Y_speed = 0;
 
 namespace
 {
@@ -12,7 +15,6 @@ const int SCREEN_HEIGHT = 450;
 const int MAX_TUBES = 100;
 const int FLAPPY_RADIUS = 18;
 const int TUBES_WIDTH = 50;
-const int GRAVITY = 1;
 const float JUMP_HEIGHT = 1.5f;
 const int TUBE_SPEED = 1;
 
@@ -112,14 +114,16 @@ void UpdateGame()
         tubes[i + 1].rec.x = tubesPos[i / 2].x;
       }
 
+      // FIXME: Fix gravity acceleration
+      // Reference: https://scratch.mit.edu/projects/502812449/editor/
+      flappy.position.y += Y_speed;
+      Y_speed += 0.1;
+      std::cout << Y_speed << "\n";
       if (::IsKeyDown(::KEY_SPACE) && !isGameOver)
       {
-        flappy.position.y -= JUMP_HEIGHT;
+        Y_speed = -1;
       }
-      else
-      {
-        flappy.position.y += GRAVITY;
-      }
+
 
       // Check Collisions
       for (int i = 0; i < MAX_TUBES * 2; i++)
