@@ -5,13 +5,14 @@
 #include <array>
 #include <iostream>
 
-int Y_speed = 0;
-
 namespace
 {
 const int SCREEN_WIDTH = 800;
 const int SCREEN_HEIGHT = 450;
 
+double Y_speed = 0.0;
+const double GRAVITATIONAL_ACCELRATION = 0.07;
+const double BOUNCE_FORCE = -1.2;
 const int MAX_TUBES = 100;
 const int FLAPPY_RADIUS = 18;
 const int TUBES_WIDTH = 50;
@@ -53,6 +54,8 @@ raylib::Texture2D backgroundTexture;
 raylib::Texture2D flappyTexture;
 raylib::Texture2D tubeTexture;
 
+void initFlappyPosition();
+bool touchBorder(raylib::Vector2);
 void InitGame();
 void UpdateGame();
 void tuneAlpha();
@@ -60,12 +63,29 @@ void announceGame();
 void DrawGame();
 void UpdateDrawFrame();
 
+bool touchBorder(raylib::Vector2 center)
+{
+  if (center.x < 0 || center.y < 0 || center.x > SCREEN_WIDTH || center.y > SCREEN_HEIGHT)
+  {
+    return true;
+  }
+  return false;
+}
+
+void initFlappyPosition()
+{
+  flappy.position.x = 80;
+  flappy.position.y = (float)(SCREEN_HEIGHT / 2 - FLAPPY_RADIUS);
+}
+
 void InitGame()
 {
   backgroundTexture = ::LoadTexture("../assets/flappy_bg.png");
   flappyTexture = ::LoadTexture("../assets/flappy_bird.png");
   tubeTexture = ::LoadTexture("../assets/flappy_tube.png");
 
+  initFlappyPosition();
+  Y_speed = 0.0;
   score = 0;
 
   for (int i = 0; i < MAX_TUBES; ++i)
@@ -114,21 +134,19 @@ void UpdateGame()
         tubes[i + 1].rec.x = tubesPos[i / 2].x;
       }
 
-      // FIXME: Fix gravity acceleration
+      // Gravitational acceleration
       // Reference: https://scratch.mit.edu/projects/502812449/editor/
       flappy.position.y += Y_speed;
-      Y_speed += 0.1;
-      std::cout << Y_speed << "\n";
+      Y_speed += GRAVITATIONAL_ACCELRATION;
       if (::IsKeyDown(::KEY_SPACE) && !isGameOver)
       {
-        Y_speed = -1;
+        Y_speed = BOUNCE_FORCE;
       }
-
 
       // Check Collisions
       for (int i = 0; i < MAX_TUBES * 2; i++)
       {
-        if (CheckCollisionCircleRec(flappy.position, flappy.radius, tubes[i].rec))
+        if (CheckCollisionCircleRec(flappy.position, flappy.radius, tubes[i].rec) || touchBorder(flappy.position))
         {
           isGameOver = true;
           isPaused = false;
@@ -204,8 +222,7 @@ void DrawGame()
 
       tubeTexture.Draw(raylib::Vector2{tubes[i * 2].rec.x + TUBES_WIDTH, tubes[i * 2].rec.y + tubes[i * 2].rec.height},
                        180.0f, 0.7f, ::PINK);
-      tubeTexture.Draw(raylib::Vector2{tubes[i * 2 + 1].rec.x, tubes[i * 2 + 1].rec.y}, 0.0f, 0.7f,
-                       ::PINK);
+      tubeTexture.Draw(raylib::Vector2{tubes[i * 2 + 1].rec.x, tubes[i * 2 + 1].rec.y}, 0.0f, 0.7f, ::PINK);
     }
 
     ::DrawText(TextFormat("%04i", score), 20, 20, 40, ::WHITE);
