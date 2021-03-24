@@ -1,4 +1,4 @@
-#include "../../../raylib-cpp/include/raylib-cpp.hpp"
+#include "../include/raylib-cpp.hpp"
 #include "raylib.h"
 
 #include <iostream>
