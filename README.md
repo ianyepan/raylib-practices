@@ -15,7 +15,7 @@ practice programming and working with basic graphics in C++.
 
 <img src="./screenshots/flappy_hell.png" width="400"/>
 
-#### Classic Arkanoid Remake
+#### Retro Arkanoid Remake
 
 <img src="./screenshots/arkanoid_gameplay.png" width="400"/>
 
